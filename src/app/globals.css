@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #F7F4EB;
+  --foreground: #292820;
+  --accent: #F15A35;
+  --secondary: #77746C;
+  --surface: #FFFDF7;
+  --border: #E9E3D8;
+  --green: #6E8B61;
+  --yellow: #F2DCA5;
+}
+
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: #F15A35;
+    color: #FFFDF7;
+  }
+}
+
+/* Custom editorial paper receipt styling */
+.receipt-paper {
+  background: #FFFDF7;
+  box-shadow: 0 10px 30px rgba(41, 40, 32, 0.08), 0 2px 6px rgba(41, 40, 32, 0.04);
+  position: relative;
+}
+
+.receipt-zigzag-bottom {
+  background: radial-gradient(circle, transparent, transparent 50%, #FFFDF7 50%, #FFFDF7 100%);
+  background-size: 14px 14px;
+}
+
+/* Hide scrollbars for clean minimal category tabs */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
+  <defs>
+    <filter id="falDrop" x="-20%" y="-20%" width="150%" height="150%">
+      <feDropShadow dx="2" dy="5" stdDeviation="3.5" flood-color="#2A1B0E" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+  <g filter="url(#falDrop)">
+    <circle cx="50" cy="55" r="26" fill="#805327"/>
+    <circle cx="50" cy="55" r="24" fill="#996633"/>
+    <circle cx="48" cy="53" r="21" fill="#B37D47" stroke="#66401A" stroke-dasharray="2 3"/>
+
+    <circle cx="105" cy="65" r="27" fill="#805327"/>
+    <circle cx="105" cy="65" r="25" fill="#996633"/>
+    <circle cx="103" cy="63" r="22" fill="#B37D47" stroke="#66401A" stroke-dasharray="2 3"/>
+
+    <circle cx="70" cy="115" r="26" fill="#805327"/>
+    <circle cx="70" cy="115" r="24" fill="#996633"/>
+    <circle cx="68" cy="113" r="21" fill="#B37D47" stroke="#66401A" stroke-dasharray="2 3"/>
+  </g>
+</svg>

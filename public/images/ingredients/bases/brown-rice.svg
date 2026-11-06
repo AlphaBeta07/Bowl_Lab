@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <radialGradient id="brownRiceBed" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#D7B58B"/>
+      <stop offset="70%" stop-color="#C59E72"/>
+      <stop offset="100%" stop-color="#B28859"/>
+    </radialGradient>
+    <pattern id="brownGrains" width="16" height="16" patternUnits="userSpaceOnUse">
+      <ellipse cx="5" cy="5" rx="4" ry="1.8" fill="#E8CDA8" transform="rotate(25 5 5)"/>
+      <ellipse cx="12" cy="11" rx="4" ry="1.8" fill="#A87E4E" transform="rotate(-35 12 11)"/>
+    </pattern>
+  </defs>
+  <circle cx="200" cy="200" r="195" fill="url(#brownRiceBed)"/>
+  <circle cx="200" cy="200" r="195" fill="url(#brownGrains)" opacity="0.75"/>
+</svg>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 450" width="100" height="450">
+  <defs>
+    <linearGradient id="woodStick" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EED5B3"/>
+      <stop offset="50%" stop-color="#D7B58B"/>
+      <stop offset="100%" stop-color="#B88F5E"/>
+    </linearGradient>
+    <filter id="stickShadow" x="-30%" y="-10%" width="180%" height="130%">
+      <feDropShadow dx="4" dy="12" stdDeviation="6" flood-color="#201A15" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+  <g filter="url(#stickShadow)">
+    <!-- Left stick -->
+    <path d="M35 15 L43 15 L32 435 L28 435 Z" fill="url(#woodStick)"/>
+    <path d="M35 15 L43 15 L41 75 L34 75 Z" fill="#3D7D73"/>
+    <!-- Right stick slightly tilted -->
+    <path d="M55 20 L63 20 L58 440 L54 440 Z" fill="url(#woodStick)"/>
+    <path d="M55 20 L63 20 L62 80 L55 80 Z" fill="#3D7D73"/>
+  </g>
+</svg>

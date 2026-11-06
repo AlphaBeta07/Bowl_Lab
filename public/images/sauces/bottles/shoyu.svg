@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 180" width="80" height="180">
+  <defs>
+    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6B2A18"/>
+      <stop offset="35%" stop-color="#FFFFFF" stop-opacity="0.25"/>
+      <stop offset="70%" stop-color="#6B2A18"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.2"/>
+    </linearGradient>
+    <filter id="bottleDrop" x="-30%" y="-10%" width="160%" height="130%">
+      <feDropShadow dx="2" dy="8" stdDeviation="5" flood-color="#241E18" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <g filter="url(#bottleDrop)">
+    <!-- Nozzle -->
+    <polygon points="37,0 43,0 45,22 35,22" fill="#E66A4E"/>
+    <!-- Cap collar -->
+    <rect x="30" y="22" width="20" height="10" rx="3" fill="#E66A4E"/>
+    <!-- Bottle neck -->
+    <path d="M 33 32 L 47 32 L 54 48 L 26 48 Z" fill="#6B2A18"/>
+    <!-- Bottle body -->
+    <rect x="20" y="48" width="40" height="110" rx="10" fill="#6B2A18"/>
+    <!-- Gradient Shine -->
+    <rect x="20" y="48" width="40" height="110" rx="10" fill="url(#bodyGrad)"/>
+    <!-- Bottle Label -->
+    <rect x="22" y="80" width="36" height="42" rx="4" fill="#FAF6EE"/>
+    <text x="40" y="96" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-weight="900" font-size="6.5" fill="#292820" text-anchor="middle" letter-spacing="0.5px">
+      SHOYU
+    </text>
+    <text x="40" y="107" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-weight="900" font-size="6.5" fill="#292820" text-anchor="middle" letter-spacing="0.5px">
+      
+    </text>
+  </g>
+</svg>

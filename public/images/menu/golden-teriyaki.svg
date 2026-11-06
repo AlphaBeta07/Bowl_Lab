@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <radialGradient id="bowlRim" cx="50%" cy="50%" r="50%">
+      <stop offset="85%" stop-color="#C79661"/>
+      <stop offset="100%" stop-color="#8F6236"/>
+    </radialGradient>
+    <filter id="menuDrop" x="-20%" y="-20%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#241E18" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  <!-- Bowl Base -->
+  <circle cx="200" cy="200" r="180" fill="url(#bowlRim)" filter="url(#menuDrop)"/>
+  <circle cx="200" cy="200" r="155" fill="#FAF6EE"/>
+  <!-- Rice Bed -->
+  <circle cx="200" cy="200" r="148" fill="#F4EFE6"/>
+  <!-- Ingredients Placed -->
+  <!-- Section 1 -->
+  <path d="M 200 200 L 200 60 A 140 140 0 0 1 330 150 Z" fill="#B58137" opacity="0.9"/>
+  <!-- Section 2 -->
+  <path d="M 200 200 L 330 150 A 140 140 0 0 1 290 300 Z" fill="#E274DC" opacity="0.9"/>
+  <!-- Section 3 -->
+  <path d="M 200 200 L 290 300 A 140 140 0 0 1 120 320 Z" fill="#DAE889" opacity="0.85"/>
+  <!-- Section 4 -->
+  <path d="M 200 200 L 120 320 A 140 140 0 0 1 80 170 Z" fill="#E2F4DC" opacity="0.9"/>
+  <!-- Section 5 -->
+  <path d="M 200 200 L 80 170 A 140 140 0 0 1 200 60 Z" fill="#C456BE" opacity="0.8"/>
+  <!-- Center Accent / Sauce -->
+  <circle cx="200" cy="200" r="45" fill="#FAF6EE" stroke="#FAF1E0" stroke-width="3"/>
+  <circle cx="200" cy="200" r="35" fill="#F15A35" opacity="0.85"/>
+  <circle cx="200" cy="200" r="18" fill="#202020" opacity="0.7"/>
+</svg>

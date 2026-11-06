@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <radialGradient id="quinoaBed" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#D8C29D"/>
+      <stop offset="100%" stop-color="#9C805B"/>
+    </radialGradient>
+  </defs>
+  <circle cx="200" cy="200" r="195" fill="url(#quinoaBed)"/>
+</svg>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <filter id="dishDrop" x="-20%" y="-20%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#1A1814" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  <g filter="url(#dishDrop)">
+    <circle cx="60" cy="60" r="52" fill="#D2CCC0"/>
+    <circle cx="60" cy="60" r="48" fill="#F5F3EC"/>
+    <circle cx="60" cy="60" r="42" fill="#E8E4DA"/>
+    <circle cx="48" cy="48" r="7" fill="#3D7D35" stroke="#93DE88" stroke-width="2.5"/>
+    <circle cx="72" cy="52" r="8" fill="#4B9642" stroke="#B0F0A6" stroke-width="2.5"/>
+    <circle cx="58" cy="72" r="7.5" fill="#3D7D35" stroke="#93DE88" stroke-width="2.5"/>
+  </g>
+</svg>

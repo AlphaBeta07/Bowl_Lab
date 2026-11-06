@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <defs>
+    <radialGradient id="bowlWoodRim" cx="50%" cy="50%" r="50%" fx="30%" fy="30%">
+      <stop offset="0%" stop-color="#E5BE90"/>
+      <stop offset="70%" stop-color="#C79661"/>
+      <stop offset="90%" stop-color="#B2824F"/>
+      <stop offset="100%" stop-color="#8F6236"/>
+    </radialGradient>
+    <radialGradient id="bowlInteriorShadow" cx="50%" cy="50%" r="50%">
+      <stop offset="75%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="92%" stop-color="#201A15" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#140E0A" stop-opacity="0.55"/>
+    </radialGradient>
+    <filter id="bowlDropShadow" x="-20%" y="-20%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="25" stdDeviation="25" flood-color="#241E18" flood-opacity="0.28"/>
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#241E18" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+  <!-- Drop Shadow -->
+  <circle cx="250" cy="250" r="230" fill="#241E18" filter="url(#bowlDropShadow)" opacity="0.5"/>
+  <!-- Outer Rim Wooden Ring -->
+  <circle cx="250" cy="250" r="230" fill="url(#bowlWoodRim)"/>
+  <!-- Rim Highlight Stroke -->
+  <circle cx="250" cy="250" r="229" fill="none" stroke="#F5DBBD" stroke-width="2.5" opacity="0.7"/>
+  <!-- Inner Rim Step -->
+  <circle cx="250" cy="250" r="202" fill="#A4723D" stroke="#775128" stroke-width="3"/>
+  <!-- Bowl Deep Interior -->
+  <circle cx="250" cy="250" r="200" fill="#FAF6EE"/>
+  <!-- Bowl Interior Depth Vignette -->
+  <circle cx="250" cy="250" r="200" fill="url(#bowlInteriorShadow)"/>
+</svg>
