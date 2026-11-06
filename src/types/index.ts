@@ -13,6 +13,21 @@ export interface Ingredient {
   defaultQuantity: number;
 }
 
+export interface BowlPieceInstance {
+  pieceId: string;
+  parentInstanceId: string;
+  ingredientId: string;
+  name: string;
+  category: IngredientCategory;
+  imageUrl: string;
+  x: number; // 0 to 1 normalized relative to bowl center (0.5, 0.5)
+  y: number; // 0 to 1 normalized
+  scale: number;
+  rotation: number;
+  zIndex: number;
+  pieceIndex: number;
+}
+
 export interface BowlIngredientInstance {
   instanceId: string;
   ingredientId: string;
@@ -20,12 +35,14 @@ export interface BowlIngredientInstance {
   category: IngredientCategory;
   imageUrl: string;
   price: number;
-  x: number; // 0 to 1 normalized relative to bowl inner circle
-  y: number; // 0 to 1 normalized
-  scale: number;
-  rotation: number;
-  zIndex: number;
   quantity: number;
+  pieces: BowlPieceInstance[];
+  // Fallback single coordinates if used as a base
+  x?: number;
+  y?: number;
+  scale?: number;
+  rotation?: number;
+  zIndex?: number;
 }
 
 export interface SauceDrizzle {
@@ -130,4 +147,3 @@ export interface RestaurantSettings {
   deliveryFee: number;
   minimumOrder: number;
 }
-

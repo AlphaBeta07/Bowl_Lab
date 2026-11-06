@@ -1,9 +1,10 @@
 'use client';
 
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
-import { BowlIngredientInstance, CustomBowl, Ingredient, SauceDrizzle } from '@/types';
+import { BowlIngredientInstance, BowlPieceInstance, CustomBowl, Ingredient, SauceDrizzle } from '@/types';
 import { INITIAL_INGREDIENTS } from '@/config/catalog';
 import { calculateCustomBowlSubtotal } from '@/lib/pricing/calculator';
+import { generateDistributedPieces } from '@/lib/placement/distributor';
 
 interface HistoryState {
   base: BowlIngredientInstance | null;
@@ -19,6 +20,7 @@ interface BowlBuilderContextType {
   activeCategory: Ingredient['category'];
   base: BowlIngredientInstance | null;
   ingredients: BowlIngredientInstance[];
+  allPieces: BowlPieceInstance[]; // Flattened array of all pieces currently in bowl
   sauces: SauceDrizzle[];
   subtotal: number;
   lastAddedInstanceId: string | null;
@@ -36,7 +38,7 @@ interface BowlBuilderContextType {
   addIngredient: (ingredient: Ingredient, customPos?: { x: number; y: number }) => void;
   removeIngredient: (instanceId: string) => void;
   removeIngredientById: (ingredientId: string) => void;
-  repositionIngredient: (instanceId: string, x: number, y: number) => void;
+  repositionPiece: (pieceId: string, x: number, y: number) => void;
   squeezeSauce: (sauceIngredient: Ingredient) => void;
   removeSauce: (sauceId: string) => void;
   undo: () => void;
@@ -48,16 +50,15 @@ interface BowlBuilderContextType {
 const BowlBuilderContext = createContext<BowlBuilderContextType | null>(null);
 
 export function BowlBuilderProvider({ children }: { children: React.ReactNode }) {
-  // Crucial Bugfix State Management:
-  // isLidOpen starts false, opens once, and remains open during all ingredient additions!
+  // Lid state machine: closed -> opening -> open -> sealing -> sealed
   const [isLidOpen, setIsLidOpen] = useState(false);
   const [isLidAnimating, setIsLidAnimating] = useState(false);
   const [isSealed, setIsSealed] = useState(false);
 
   const [activeCategory, setActiveCategory] = useState<Ingredient['category']>('proteins');
-  
+
   // Default base initialized to sushi-rice
-  const defaultBaseIngredient = INITIAL_INGREDIENTS.find(i => i.id === 'sushi-rice') || INITIAL_INGREDIENTS[0];
+  const defaultBaseIngredient = INITIAL_INGREDIENTS.find((i) => i.id === 'sushi-rice') || INITIAL_INGREDIENTS[0];
   const [base, setBase] = useState<BowlIngredientInstance | null>({
     instanceId: 'base-initial',
     ingredientId: defaultBaseIngredient.id,
@@ -65,6 +66,7 @@ export function BowlBuilderProvider({ children }: { children: React.ReactNode })
     category: 'bases',
     imageUrl: defaultBaseIngredient.imageUrl,
     price: defaultBaseIngredient.price,
+    pieces: [],
     x: 0.5,
     y: 0.5,
     scale: 1,
@@ -78,16 +80,30 @@ export function BowlBuilderProvider({ children }: { children: React.ReactNode })
   const [history, setHistory] = useState<HistoryState[]>([]);
   const [lastAddedInstanceId, setLastAddedInstanceId] = useState<string | null>(null);
   const [activeSqueezingSauce, setActiveSqueezingSauce] = useState<Ingredient | null>(null);
-  const [statusMessage, setStatusMessage] = useState<string>('Your bowl is waiting. Lift the lid to start building.');
+  const [statusMessage, setStatusMessage] = useState<string>(
+    'Your bowl is waiting. Lift the lid to start building.'
+  );
+
+  // Flattened pieces array across all placed ingredients
+  const allPieces = useMemo(() => {
+    return ingredients.flatMap((ing) => ing.pieces || []);
+  }, [ingredients]);
 
   const saveHistory = useCallback(() => {
     setHistory((prev) => [
-      ...prev.slice(-15), // keep last 15 actions
-      { base, ingredients: [...ingredients], sauces: [...sauces] },
+      ...prev.slice(-15),
+      {
+        base,
+        ingredients: ingredients.map((ing) => ({
+          ...ing,
+          pieces: [...(ing.pieces || [])],
+        })),
+        sauces: [...sauces],
+      },
     ]);
   }, [base, ingredients, sauces]);
 
-  // 1. Open the Lid (ONCE)
+  // 1. Open Lid (ONCE per building session)
   const openLid = useCallback(() => {
     if (isLidOpen || isLidAnimating) return;
     setIsLidAnimating(true);
@@ -121,108 +137,109 @@ export function BowlBuilderProvider({ children }: { children: React.ReactNode })
     openLid();
   }, [openLid]);
 
-  // 4. Select Base (e.g. Rice, Quinoa)
-  const selectBase = useCallback((baseIng: Ingredient) => {
-    saveHistory();
-    setBase({
-      instanceId: `base-${Date.now()}`,
-      ingredientId: baseIng.id,
-      name: baseIng.name,
-      category: 'bases',
-      imageUrl: baseIng.imageUrl,
-      price: baseIng.price,
-      x: 0.5,
-      y: 0.5,
-      scale: 1,
-      rotation: 0,
-      zIndex: 1,
-      quantity: 1,
-    });
-    setStatusMessage(`${baseIng.name} selected as base.`);
-  }, [saveHistory]);
+  // 4. Select Base (e.g. Sushi Rice, Quinoa)
+  const selectBase = useCallback(
+    (baseIng: Ingredient) => {
+      saveHistory();
+      setBase({
+        instanceId: `base-${Date.now()}`,
+        ingredientId: baseIng.id,
+        name: baseIng.name,
+        category: 'bases',
+        imageUrl: baseIng.imageUrl,
+        price: baseIng.price,
+        pieces: [],
+        x: 0.5,
+        y: 0.5,
+        scale: 1,
+        rotation: 0,
+        zIndex: 1,
+        quantity: 1,
+      });
+      setStatusMessage(`${baseIng.name} selected as base.`);
+    },
+    [saveHistory]
+  );
 
-  // 5. Subsequent Ingredient Addition (NEVER REOPENS LID)
-  const addIngredient = useCallback((ingredient: Ingredient, customPos?: { x: number; y: number }) => {
-    // If the lid is closed, prompt user to open lid first
-    if (!isLidOpen && !isSealed) {
-      openLid();
-      return;
-    }
-    if (isLidAnimating || isSealed) return;
+  // 5. Subsequent Ingredient Addition with NATURAL SPREAD (Never reopens lid!)
+  const addIngredient = useCallback(
+    (ingredient: Ingredient, customPos?: { x: number; y: number }) => {
+      // If the lid is closed, prompt user to open lid first
+      if (!isLidOpen && !isSealed) {
+        openLid();
+        return;
+      }
+      if (isLidAnimating || isSealed) return;
 
-    saveHistory();
+      saveHistory();
 
-    // Natural circular sector placement inside the bowl if not custom positioned
-    let x = 0.5;
-    let y = 0.5;
-    let rotation = (Math.random() - 0.5) * 30; // -15 to +15 deg
-    let scale = 0.85 + Math.random() * 0.15;
+      const newInstanceId = `ing-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-    if (customPos) {
-      x = customPos.x;
-      y = customPos.y;
-    } else {
-      // Calculate sector angle based on number of ingredients
-      const count = ingredients.length;
-      const angle = (count * 68 * Math.PI) / 180; // golden ratio step in radians
-      const radius = 0.22 + (count % 3) * 0.08; // distance from center (0.22 to 0.38)
-      x = 0.5 + Math.cos(angle) * radius;
-      y = 0.5 + Math.sin(angle) * radius;
-    }
+      // Existing pieces currently in the bowl
+      const currentPieces = ingredients.flatMap((ing) => ing.pieces || []);
 
-    const newInstanceId = `ing-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      // Distribute multiple individual pieces naturally across the entire bowl
+      const generatedPieces = generateDistributedPieces(
+        ingredient,
+        newInstanceId,
+        [...currentPieces],
+        customPos
+      );
 
-    const newInstance: BowlIngredientInstance = {
-      instanceId: newInstanceId,
-      ingredientId: ingredient.id,
-      name: ingredient.name,
-      category: ingredient.category,
-      imageUrl: ingredient.imageUrl,
-      price: ingredient.price,
-      x,
-      y,
-      scale,
-      rotation,
-      zIndex: 10 + ingredients.length,
-      quantity: 1,
-    };
+      const newInstance: BowlIngredientInstance = {
+        instanceId: newInstanceId,
+        ingredientId: ingredient.id,
+        name: ingredient.name,
+        category: ingredient.category,
+        imageUrl: ingredient.imageUrl,
+        price: ingredient.price,
+        quantity: 1,
+        pieces: generatedPieces,
+      };
 
-    setLastAddedInstanceId(newInstanceId);
-    setIngredients((prev) => [...prev, newInstance]);
-    setStatusMessage(`${ingredient.name} added.`);
-  }, [isLidOpen, isLidAnimating, isSealed, ingredients.length, saveHistory, openLid]);
+      setLastAddedInstanceId(newInstanceId);
+      setIngredients((prev) => [...prev, newInstance]);
+      setStatusMessage(`${ingredient.name} added.`);
+    },
+    [isLidOpen, isLidAnimating, isSealed, ingredients, saveHistory, openLid]
+  );
 
   // 6. Remove Ingredient
-  const removeIngredient = useCallback((instanceId: string) => {
-    saveHistory();
-    setIngredients((prev) => {
-      const removed = prev.find((i) => i.instanceId === instanceId);
-      if (removed) {
-        setStatusMessage(`${removed.name} removed.`);
-      }
-      return prev.filter((i) => i.instanceId !== instanceId);
-    });
-  }, [saveHistory]);
+  const removeIngredient = useCallback(
+    (instanceId: string) => {
+      saveHistory();
+      setIngredients((prev) => {
+        const removed = prev.find((i) => i.instanceId === instanceId);
+        if (removed) {
+          setStatusMessage(`${removed.name} removed.`);
+        }
+        return prev.filter((i) => i.instanceId !== instanceId);
+      });
+    },
+    [saveHistory]
+  );
 
-  const removeIngredientById = useCallback((ingredientId: string) => {
-    saveHistory();
-    setIngredients((prev) => {
-      // Remove the latest instance of this ingredient
-      const matches = prev.filter((i) => i.ingredientId === ingredientId);
-      if (matches.length === 0) return prev;
-      const toRemove = matches[matches.length - 1];
-      setStatusMessage(`${toRemove.name} removed.`);
-      return prev.filter((i) => i.instanceId !== toRemove.instanceId);
-    });
-  }, [saveHistory]);
+  const removeIngredientById = useCallback(
+    (ingredientId: string) => {
+      saveHistory();
+      setIngredients((prev) => {
+        const matches = prev.filter((i) => i.ingredientId === ingredientId);
+        if (matches.length === 0) return prev;
+        const toRemove = matches[matches.length - 1];
+        setStatusMessage(`${toRemove.name} removed.`);
+        return prev.filter((i) => i.instanceId !== toRemove.instanceId);
+      });
+    },
+    [saveHistory]
+  );
 
-  // 7. Reposition Ingredient inside bowl (drag & touch)
-  const repositionIngredient = useCallback((instanceId: string, x: number, y: number) => {
-    // Clamp to circular boundary (radius <= 0.44 from center (0.5, 0.5))
+  // 7. Reposition Individual Piece (drag & touch)
+  const repositionPiece = useCallback((pieceId: string, x: number, y: number) => {
+    // Clamp to circular boundary (radius <= 0.40 from center (0.5, 0.5))
     const dx = x - 0.5;
     const dy = y - 0.5;
     const dist = Math.sqrt(dx * dx + dy * dy);
-    const maxRadius = 0.42;
+    const maxRadius = 0.40;
 
     let clampedX = x;
     let clampedY = y;
@@ -232,61 +249,70 @@ export function BowlBuilderProvider({ children }: { children: React.ReactNode })
     }
 
     setIngredients((prev) =>
-      prev.map((item) =>
-        item.instanceId === instanceId
-          ? { ...item, x: clampedX, y: clampedY }
-          : item
-      )
+      prev.map((ing) => {
+        if (!ing.pieces.some((p) => p.pieceId === pieceId)) return ing;
+        return {
+          ...ing,
+          pieces: ing.pieces.map((p) =>
+            p.pieceId === pieceId ? { ...p, x: clampedX, y: clampedY } : p
+          ),
+        };
+      })
     );
   }, []);
 
   // 8. Sauce Squeeze Animation Trigger
-  const squeezeSauce = useCallback((sauceIngredient: Ingredient) => {
-    if (!isLidOpen || isLidAnimating || isSealed) return;
+  const squeezeSauce = useCallback(
+    (sauceIngredient: Ingredient) => {
+      if (!isLidOpen || isLidAnimating || isSealed) return;
 
-    saveHistory();
-    setActiveSqueezingSauce(sauceIngredient);
-    setStatusMessage(`Drizzling ${sauceIngredient.name}...`);
+      saveHistory();
+      setActiveSqueezingSauce(sauceIngredient);
+      setStatusMessage(`Drizzling ${sauceIngredient.name}...`);
 
-    // Add sauce drizzle overlay
-    const overlayMap: Record<string, string> = {
-      'spicy-mayo': '/images/sauces/overlays/spicy-mayo-drizzle.svg',
-      'shoyu': '/images/sauces/overlays/shoyu-drizzle.svg',
-      'sesame-ginger': '/images/sauces/overlays/sesame-ginger-drizzle.svg',
-      'sriracha': '/images/sauces/overlays/sriracha-drizzle.svg',
-    };
+      const overlayMap: Record<string, string> = {
+        'spicy-mayo': '/images/sauces/overlays/spicy-mayo-drizzle.svg',
+        'shoyu': '/images/sauces/overlays/shoyu-drizzle.svg',
+        'sesame-ginger': '/images/sauces/overlays/sesame-ginger-drizzle.svg',
+        'sriracha': '/images/sauces/overlays/sriracha-drizzle.svg',
+      };
 
-    const drizzleOverlay = overlayMap[sauceIngredient.id] || '/images/sauces/overlays/spicy-mayo-drizzle.svg';
+      const drizzleOverlay =
+        overlayMap[sauceIngredient.id] || '/images/sauces/overlays/spicy-mayo-drizzle.svg';
 
-    setTimeout(() => {
-      setSauces((prev) => {
-        // avoid duplicate same sauce
-        if (prev.some((s) => s.sauceId === sauceIngredient.id)) {
-          return prev;
-        }
-        return [
-          ...prev,
-          {
-            id: `sauce-${Date.now()}`,
-            sauceId: sauceIngredient.id,
-            name: sauceIngredient.name,
-            overlayUrl: drizzleOverlay,
-            bottleUrl: sauceIngredient.imageUrl,
-            price: sauceIngredient.price,
-            color: '#F15A35',
-          },
-        ];
-      });
-      setActiveSqueezingSauce(null);
-      setStatusMessage(`${sauceIngredient.name} drizzled.`);
-    }, 1200);
-  }, [isLidOpen, isLidAnimating, isSealed, saveHistory]);
+      setTimeout(() => {
+        setSauces((prev) => {
+          if (prev.some((s) => s.sauceId === sauceIngredient.id)) {
+            return prev;
+          }
+          return [
+            ...prev,
+            {
+              id: `sauce-${Date.now()}`,
+              sauceId: sauceIngredient.id,
+              name: sauceIngredient.name,
+              overlayUrl: drizzleOverlay,
+              bottleUrl: sauceIngredient.imageUrl,
+              price: sauceIngredient.price,
+              color: '#F15A35',
+            },
+          ];
+        });
+        setActiveSqueezingSauce(null);
+        setStatusMessage(`${sauceIngredient.name} drizzled.`);
+      }, 1200);
+    },
+    [isLidOpen, isLidAnimating, isSealed, saveHistory]
+  );
 
-  const removeSauce = useCallback((sauceId: string) => {
-    saveHistory();
-    setSauces((prev) => prev.filter((s) => s.sauceId !== sauceId));
-    setStatusMessage('Sauce removed.');
-  }, [saveHistory]);
+  const removeSauce = useCallback(
+    (sauceId: string) => {
+      saveHistory();
+      setSauces((prev) => prev.filter((s) => s.sauceId !== sauceId));
+      setStatusMessage('Sauce removed.');
+    },
+    [saveHistory]
+  );
 
   // 9. Undo
   const undo = useCallback(() => {
@@ -307,68 +333,75 @@ export function BowlBuilderProvider({ children }: { children: React.ReactNode })
     setStatusMessage('Bowl reset. Ready to build fresh.');
   }, [saveHistory]);
 
-  // 11. Load Predefined Bowl into Builder
-  const loadPredefined = useCallback((bowlName: string, baseId: string, ingredientIds: string[], sauceIds: string[]) => {
-    const matchedBase = INITIAL_INGREDIENTS.find(i => i.id === baseId);
-    if (matchedBase) {
-      setBase({
-        instanceId: `base-${Date.now()}`,
-        ingredientId: matchedBase.id,
-        name: matchedBase.name,
-        category: 'bases',
-        imageUrl: matchedBase.imageUrl,
-        price: matchedBase.price,
-        x: 0.5,
-        y: 0.5,
-        scale: 1,
-        rotation: 0,
-        zIndex: 1,
-        quantity: 1,
-      });
-    }
-
-    const loadedIngredients: BowlIngredientInstance[] = [];
-    ingredientIds.forEach((id, idx) => {
-      const ing = INITIAL_INGREDIENTS.find(i => i.id === id);
-      if (ing) {
-        const angle = (idx * 68 * Math.PI) / 180;
-        const radius = 0.24 + (idx % 3) * 0.08;
-        loadedIngredients.push({
-          instanceId: `predef-${id}-${idx}`,
-          ingredientId: ing.id,
-          name: ing.name,
-          category: ing.category,
-          imageUrl: ing.imageUrl,
-          price: ing.price,
-          x: 0.5 + Math.cos(angle) * radius,
-          y: 0.5 + Math.sin(angle) * radius,
-          scale: 0.9,
-          rotation: (idx % 2 === 0 ? 1 : -1) * 12,
-          zIndex: 10 + idx,
+  // 11. Load Predefined Bowl into Builder (with natural distributed pieces!)
+  const loadPredefined = useCallback(
+    (bowlName: string, baseId: string, ingredientIds: string[], sauceIds: string[]) => {
+      const matchedBase = INITIAL_INGREDIENTS.find((i) => i.id === baseId);
+      if (matchedBase) {
+        setBase({
+          instanceId: `base-${Date.now()}`,
+          ingredientId: matchedBase.id,
+          name: matchedBase.name,
+          category: 'bases',
+          imageUrl: matchedBase.imageUrl,
+          price: matchedBase.price,
+          pieces: [],
+          x: 0.5,
+          y: 0.5,
+          scale: 1,
+          rotation: 0,
+          zIndex: 1,
           quantity: 1,
         });
       }
-    });
-    setIngredients(loadedIngredients);
 
-    const loadedSauces: SauceDrizzle[] = [];
-    sauceIds.forEach((id) => {
-      const sauce = INITIAL_INGREDIENTS.find(i => i.id === id);
-      if (sauce) {
-        loadedSauces.push({
-          id: `sauce-${id}`,
-          sauceId: sauce.id,
-          name: sauce.name,
-          overlayUrl: id === 'shoyu' ? '/images/sauces/overlays/shoyu-drizzle.svg' : '/images/sauces/overlays/spicy-mayo-drizzle.svg',
-          bottleUrl: sauce.imageUrl,
-          price: sauce.price,
-          color: '#F15A35',
-        });
-      }
-    });
-    setSauces(loadedSauces);
-    setStatusMessage(`Loaded ${bowlName}. Customize freely!`);
-  }, []);
+      const loadedIngredients: BowlIngredientInstance[] = [];
+      let accumulatedPieces: BowlPieceInstance[] = [];
+
+      ingredientIds.forEach((id) => {
+        const ing = INITIAL_INGREDIENTS.find((i) => i.id === id);
+        if (ing) {
+          const parentId = `predef-${id}-${Date.now()}`;
+          const pieces = generateDistributedPieces(ing, parentId, [...accumulatedPieces]);
+          accumulatedPieces = [...accumulatedPieces, ...pieces];
+
+          loadedIngredients.push({
+            instanceId: parentId,
+            ingredientId: ing.id,
+            name: ing.name,
+            category: ing.category,
+            imageUrl: ing.imageUrl,
+            price: ing.price,
+            quantity: 1,
+            pieces,
+          });
+        }
+      });
+      setIngredients(loadedIngredients);
+
+      const loadedSauces: SauceDrizzle[] = [];
+      sauceIds.forEach((id) => {
+        const sauce = INITIAL_INGREDIENTS.find((i) => i.id === id);
+        if (sauce) {
+          loadedSauces.push({
+            id: `sauce-${id}`,
+            sauceId: sauce.id,
+            name: sauce.name,
+            overlayUrl:
+              id === 'shoyu'
+                ? '/images/sauces/overlays/shoyu-drizzle.svg'
+                : '/images/sauces/overlays/spicy-mayo-drizzle.svg',
+            bottleUrl: sauce.imageUrl,
+            price: sauce.price,
+            color: '#F15A35',
+          });
+        }
+      });
+      setSauces(loadedSauces);
+      setStatusMessage(`Loaded ${bowlName}. Customize freely!`);
+    },
+    []
+  );
 
   // Live calculated subtotal
   const subtotal = useMemo(() => {
@@ -404,6 +437,7 @@ export function BowlBuilderProvider({ children }: { children: React.ReactNode })
         activeCategory,
         base,
         ingredients,
+        allPieces,
         sauces,
         subtotal,
         lastAddedInstanceId,
@@ -419,7 +453,7 @@ export function BowlBuilderProvider({ children }: { children: React.ReactNode })
         addIngredient,
         removeIngredient,
         removeIngredientById,
-        repositionIngredient,
+        repositionPiece,
         squeezeSauce,
         removeSauce,
         undo,
@@ -440,4 +474,3 @@ export function useBowlBuilder() {
   }
   return ctx;
 }
-

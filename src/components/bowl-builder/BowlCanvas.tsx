@@ -8,6 +8,7 @@ import BowlLid from './BowlLid';
 import IngredientLayer from './IngredientLayer';
 import SauceStream from './SauceStream';
 import { Sparkles, RefreshCw } from 'lucide-react';
+import { Ingredient } from '@/types';
 
 export default function BowlCanvas() {
   const {
@@ -15,7 +16,7 @@ export default function BowlCanvas() {
     isLidAnimating,
     isSealed,
     base,
-    ingredients,
+    allPieces,
     sauces,
     lastAddedInstanceId,
     activeSqueezingSauce,
@@ -23,13 +24,17 @@ export default function BowlCanvas() {
     onLidOpenComplete,
     onSealComplete,
     removeIngredient,
-    repositionIngredient,
+    repositionPiece,
+    addIngredient,
+    selectBase,
+    squeezeSauce,
     reopenBowl,
   } = useBowlBuilder();
 
   const bowlContainerRef = useRef<HTMLDivElement>(null);
   const lidRef = useRef<HTMLDivElement>(null);
   const [bowlDiameter, setBowlDiameter] = useState<number>(440);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   // Responsive diameter measurement
   useEffect(() => {
@@ -44,7 +49,7 @@ export default function BowlCanvas() {
   }, []);
 
   // GSAP Lid Animation Controller
-  // CRITICAL BUGFIX: Runs ONLY when opening starts or sealing starts, NOT on ingredient additions!
+  // CRITICAL: Runs ONLY when opening starts or sealing starts, NEVER on ingredient additions!
   useEffect(() => {
     if (!lidRef.current) return;
 
@@ -111,6 +116,45 @@ export default function BowlCanvas() {
     }
   }, [isLidAnimating, isLidOpen, isSealed, onLidOpenComplete, onSealComplete]);
 
+  // Handle Drag and Drop from Ingredient Cards
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+    if (!isDragOver) setIsDragOver(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+
+    if (isSealed) return;
+
+    try {
+      const data = e.dataTransfer.getData('application/json');
+      if (!data) return;
+      const ingredient = JSON.parse(data) as Ingredient;
+
+      if (!bowlContainerRef.current) return;
+      const rect = bowlContainerRef.current.getBoundingClientRect();
+      const dropX = (e.clientX - rect.left) / rect.width;
+      const dropY = (e.clientY - rect.top) / rect.height;
+
+      if (ingredient.category === 'bases') {
+        selectBase(ingredient);
+      } else if (ingredient.category === 'sauces') {
+        squeezeSauce(ingredient);
+      } else {
+        addIngredient(ingredient, { x: dropX, y: dropY });
+      }
+    } catch (err) {
+      console.error('Drop handling error:', err);
+    }
+  };
+
   return (
     <div className="relative flex flex-col items-center justify-center w-full select-none py-2 sm:py-6">
       
@@ -120,7 +164,12 @@ export default function BowlCanvas() {
         {/* Central Bowl Container */}
         <div
           ref={bowlContainerRef}
-          className="relative w-[310px] h-[310px] xs:w-[360px] xs:h-[360px] sm:w-[420px] sm:h-[420px] lg:w-[460px] lg:h-[460px] transition-all"
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={`relative w-[310px] h-[310px] xs:w-[360px] xs:h-[360px] sm:w-[420px] sm:h-[420px] lg:w-[460px] lg:h-[460px] transition-all ${
+            isDragOver ? 'scale-[1.02] ring-4 ring-accent/30 rounded-full' : ''
+          }`}
         >
           {/* 1. Bowl Base & Outer Wooden Rim */}
           <div className="absolute inset-0 pointer-events-none z-0">
@@ -140,7 +189,7 @@ export default function BowlCanvas() {
               clipPath: 'circle(48% at 50% 50%)',
             }}
           >
-            {/* 2a. Base Layer (e.g. Sushi Rice, Brown Rice, Quinoa) */}
+            {/* 2a. Base Layer (Sushi Rice, Brown Rice, Quinoa, Greens) */}
             {base && (
               <div className="absolute inset-0 z-0 pointer-events-none">
                 <Image
@@ -153,15 +202,15 @@ export default function BowlCanvas() {
               </div>
             )}
 
-            {/* 2b. Ingredients Placed (Rendered independently with GSAP on entrance) */}
-            {ingredients.map((item) => (
+            {/* 2b. Ingredients Placed (Rendered as naturally distributed individual pieces!) */}
+            {allPieces.map((piece) => (
               <IngredientLayer
-                key={item.instanceId}
-                instance={item}
-                isNewlyAdded={lastAddedInstanceId === item.instanceId}
+                key={piece.pieceId}
+                piece={piece}
+                isNewlyAdded={lastAddedInstanceId === piece.parentInstanceId}
                 bowlWidth={bowlDiameter * 0.8}
                 onRemove={removeIngredient}
-                onReposition={repositionIngredient}
+                onRepositionPiece={repositionPiece}
               />
             ))}
 
@@ -237,4 +286,3 @@ export default function BowlCanvas() {
     </div>
   );
 }
-

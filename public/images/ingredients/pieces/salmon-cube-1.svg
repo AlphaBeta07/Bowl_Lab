@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+  <defs>
+    <filter id="salShad1" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="1" dy="3.5" stdDeviation="2.5" flood-color="#2D1107" flood-opacity="0.32"/>
+    </filter>
+    <linearGradient id="salTop1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFAE94"/>
+      <stop offset="70%" stop-color="#FF8A68"/>
+      <stop offset="100%" stop-color="#FA704B"/>
+    </linearGradient>
+    <linearGradient id="salSideL1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F26844"/>
+      <stop offset="100%" stop-color="#D44926"/>
+    </linearGradient>
+    <linearGradient id="salSideR1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#DC5430"/>
+      <stop offset="100%" stop-color="#B23819"/>
+    </linearGradient>
+  </defs>
+  <g filter="url(#salShad1)">
+    <!-- Top isometric face -->
+    <polygon points="40,12 66,27 40,42 14,27" fill="url(#salTop1)"/>
+    <!-- Left face -->
+    <polygon points="14,27 40,42 40,68 14,53" fill="url(#salSideL1)"/>
+    <!-- Right face -->
+    <polygon points="40,42 66,27 66,53 40,68" fill="url(#salSideR1)"/>
+    <!-- Realistic white fat marbling lines across grain -->
+    <path d="M 24 21 Q 40 31 56 22" stroke="#FFF5F0" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.85"/>
+    <path d="M 18 38 Q 40 50 62 40" stroke="#FFF5F0" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.75"/>
+    <!-- Specular highlight -->
+    <ellipse cx="38" cy="26" rx="5" ry="2" fill="#FFFFFF" opacity="0.45" transform="rotate(-15 38 26)"/>
+  </g>
+</svg>

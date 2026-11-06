@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" width="60" height="60">
+  <defs>
+    <filter id="cornShad1" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="1" dy="2" stdDeviation="1.5" flood-color="#442D05" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <g filter="url(#cornShad1)">
+    <circle cx="26" cy="26" r="12" fill="#D99709"/>
+    <circle cx="25" cy="25" r="10" fill="#F8BC17"/>
+    <circle cx="23" cy="23" r="4.5" fill="#FFEAA3"/>
+
+    <circle cx="38" cy="34" r="11" fill="#D99709"/>
+    <circle cx="37" cy="33" r="9" fill="#F8BC17"/>
+  </g>
+</svg>

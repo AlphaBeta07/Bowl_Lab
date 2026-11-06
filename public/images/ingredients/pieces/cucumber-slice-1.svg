@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 70" width="70" height="70">
+  <defs>
+    <filter id="cucShad1" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="1" dy="3" stdDeviation="2" flood-color="#0F2B14" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <g filter="url(#cucShad1)">
+    <!-- Dark green skin ring -->
+    <circle cx="35" cy="35" r="30" fill="#205524"/>
+    <!-- Pale translucent interior -->
+    <circle cx="35" cy="35" r="27" fill="#E4F5DE"/>
+    <!-- Soft seed ring -->
+    <circle cx="35" cy="35" r="16" fill="#D0ECC4" stroke="#B1D99C" stroke-width="1.8" stroke-dasharray="3 2"/>
+    <!-- Tiny seeds -->
+    <ellipse cx="32" cy="27" rx="3.5" ry="1.2" fill="#9CC985" transform="rotate(30 32 27)"/>
+    <ellipse cx="40" cy="30" rx="3.5" ry="1.2" fill="#9CC985" transform="rotate(-40 40 30)"/>
+    <ellipse cx="33" cy="41" rx="3.5" ry="1.2" fill="#9CC985" transform="rotate(70 33 41)"/>
+    <ellipse cx="39" cy="39" rx="3.5" ry="1.2" fill="#9CC985" transform="rotate(-15 39 39)"/>
+  </g>
+</svg>

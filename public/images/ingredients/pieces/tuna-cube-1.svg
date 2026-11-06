@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+  <defs>
+    <filter id="tunaShad1" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="1" dy="3.5" stdDeviation="2.5" flood-color="#280309" flood-opacity="0.38"/>
+    </filter>
+  </defs>
+  <g filter="url(#tunaShad1)">
+    <polygon points="40,14 65,28 40,42 15,28" fill="#E62248"/>
+    <polygon points="15,28 40,42 40,66 15,52" fill="#B80E2E"/>
+    <polygon points="40,42 65,28 65,52 40,66" fill="#8A061F"/>
+    <ellipse cx="36" cy="27" rx="6" ry="2.5" fill="#FFFFFF" opacity="0.4" transform="rotate(-15 36 27)"/>
+    <circle cx="48" cy="25" r="2" fill="#FFFFFF" opacity="0.35"/>
+  </g>
+</svg>

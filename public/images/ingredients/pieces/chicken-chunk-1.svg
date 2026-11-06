@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+  <defs>
+    <filter id="chkShad1" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="1" dy="3.5" stdDeviation="2.5" flood-color="#2D1A0A" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <g filter="url(#chkShad1)">
+    <path d="M 18 36 C 24 20 54 22 64 36 C 68 50 48 64 26 58 C 14 54 12 46 18 36 Z" fill="#E8C59A"/>
+    <!-- Grill marks -->
+    <path d="M 32 25 L 42 54" stroke="#7A4212" stroke-width="3.5" stroke-linecap="round" opacity="0.85"/>
+    <path d="M 46 27 L 54 52" stroke="#7A4212" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+  </g>
+</svg>

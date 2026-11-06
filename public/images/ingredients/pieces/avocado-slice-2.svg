@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 90" width="90" height="90">
+  <defs>
+    <filter id="avoShad2" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="1.5" dy="3.5" stdDeviation="2.5" flood-color="#141E10" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <g filter="url(#avoShad2)">
+    <path d="M 20 74 C 20 38 40 18 76 18 C 72 30 56 56 38 76 Z" fill="#243D17"/>
+    <path d="M 23 72 C 23 40 42 22 74 22 C 68 35 52 58 39 73 Z" fill="#75A63B"/>
+    <path d="M 27 68 C 28 44 46 28 70 27 C 62 40 48 60 41 69 Z" fill="#D3E578"/>
+  </g>
+</svg>

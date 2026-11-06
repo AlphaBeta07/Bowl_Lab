@@ -98,3 +98,4 @@ To connect a live Supabase PostgreSQL database:
    SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
    ```
 *(If no Supabase credentials are configured, the app runs automatically with a complete local mock store with full CRUD capabilities).*
+

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+  <defs>
+    <filter id="panShad1" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="1" dy="3" stdDeviation="2.5" flood-color="#221E18" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+  <g filter="url(#panShad1)">
+    <polygon points="40,15 65,28 40,41 15,28" fill="#FFFFFF"/>
+    <polygon points="15,28 40,41 40,65 15,52" fill="#F4EFE6"/>
+    <polygon points="40,41 65,28 65,52 40,65" fill="#E2DACB"/>
+    <!-- Fresh green herb specks -->
+    <circle cx="34" cy="25" r="1.5" fill="#3D7D35"/>
+    <circle cx="48" cy="30" r="1.5" fill="#3D7D35"/>
+    <circle cx="28" cy="44" r="1.5" fill="#3D7D35"/>
+  </g>
+</svg>

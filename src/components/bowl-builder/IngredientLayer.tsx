@@ -3,53 +3,56 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Image from 'next/image';
 import gsap from 'gsap';
-import { BowlIngredientInstance } from '@/types';
+import { BowlPieceInstance } from '@/types';
 import { X } from 'lucide-react';
 
 interface IngredientLayerProps {
-  instance: BowlIngredientInstance;
+  piece: BowlPieceInstance;
   isNewlyAdded: boolean;
   bowlWidth: number;
   onRemove: (instanceId: string) => void;
-  onReposition: (instanceId: string, x: number, y: number) => void;
+  onRepositionPiece: (pieceId: string, x: number, y: number) => void;
 }
 
 export default function IngredientLayer({
-  instance,
+  piece,
   isNewlyAdded,
   bowlWidth,
   onRemove,
-  onReposition,
+  onRepositionPiece,
 }: IngredientLayerProps) {
   const elRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [showControls, setShowControls] = useState(false);
   const dragStartRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
 
-  // GSAP Entrance Animation: ONLY runs for the newly added ingredient!
+  // GSAP Entrance Animation: Runs with natural stagger for newly added pieces
   useEffect(() => {
     if (isNewlyAdded && elRef.current) {
+      const staggerDelay = (piece.pieceIndex || 0) * 0.055;
+
       gsap.fromTo(
         elRef.current,
         {
-          scale: 0.3,
+          scale: 0.4,
           opacity: 0,
-          y: -25,
-          rotation: instance.rotation - 15,
+          y: -22,
+          rotation: piece.rotation - 20,
         },
         {
-          scale: instance.scale,
+          scale: piece.scale,
           opacity: 1,
           y: 0,
-          rotation: instance.rotation,
+          rotation: piece.rotation,
           duration: 0.45,
-          ease: 'back.out(1.7)',
+          delay: staggerDelay,
+          ease: 'back.out(1.6)',
         }
       );
     }
-  }, [isNewlyAdded, instance.rotation, instance.scale]);
+  }, [isNewlyAdded, piece.rotation, piece.scale, piece.pieceIndex]);
 
-  // Pointer Drag Handler (Native Pointer Events for reliable desktop + touch!)
+  // Pointer Drag Handler (Native Pointer Events for reliable desktop + touch)
   const handlePointerDown = (e: React.PointerEvent) => {
     e.stopPropagation();
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
@@ -59,8 +62,8 @@ export default function IngredientLayer({
     dragStartRef.current = {
       startX: e.clientX,
       startY: e.clientY,
-      origX: instance.x,
-      origY: instance.y,
+      origX: piece.x,
+      origY: piece.y,
     };
   };
 
@@ -73,7 +76,7 @@ export default function IngredientLayer({
     const nextX = dragStartRef.current.origX + deltaX;
     const nextY = dragStartRef.current.origY + deltaY;
 
-    onReposition(instance.instanceId, nextX, nextY);
+    onRepositionPiece(piece.pieceId, nextX, nextY);
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
@@ -87,9 +90,12 @@ export default function IngredientLayer({
   };
 
   // Convert normalized (0 to 1) coordinates to pixel center
-  const posX = instance.x * bowlWidth;
-  const posY = instance.y * bowlWidth;
-  const itemSize = Math.max(70, bowlWidth * 0.28);
+  const posX = piece.x * bowlWidth;
+  const posY = piece.y * bowlWidth;
+  
+  // Adaptive piece size based on bowl diameter
+  // Individual pieces are appropriately sized (~15% to 20% of bowl diameter)
+  const pieceSize = Math.max(38, bowlWidth * 0.175);
 
   return (
     <div
@@ -104,41 +110,40 @@ export default function IngredientLayer({
         position: 'absolute',
         left: `${posX}px`,
         top: `${posY}px`,
-        width: `${itemSize}px`,
-        height: `${itemSize}px`,
-        transform: `translate(-50%, -50%) rotate(${instance.rotation}deg) scale(${instance.scale})`,
-        zIndex: isDragging ? 100 : instance.zIndex,
+        width: `${pieceSize}px`,
+        height: `${pieceSize}px`,
+        transform: `translate(-50%, -50%) rotate(${piece.rotation}deg) scale(${piece.scale})`,
+        zIndex: isDragging ? 120 : piece.zIndex,
         touchAction: 'none',
       }}
       className={`cursor-grab active:cursor-grabbing select-none group transition-shadow ${
-        isDragging ? 'filter drop-shadow-xl scale-105' : ''
+        isDragging ? 'filter drop-shadow-xl scale-110 z-50' : ''
       }`}
-      title={`${instance.name} (drag to arrange, tap to remove)`}
+      title={`${piece.name} (drag to reposition)`}
     >
       <div className="relative w-full h-full">
         <Image
-          src={instance.imageUrl}
-          alt={instance.name}
+          src={piece.imageUrl}
+          alt={piece.name}
           fill
-          sizes="(max-width: 768px) 120px, 160px"
-          className="object-contain pointer-events-none drop-shadow-md"
+          sizes="80px"
+          className="object-contain pointer-events-none drop-shadow-sm"
         />
 
-        {/* Small quick remove button on hover or active */}
+        {/* Small quick remove button when hovered */}
         {showControls && (
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onRemove(instance.instanceId);
+              onRemove(piece.parentInstanceId);
             }}
-            className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-accent text-white flex items-center justify-center shadow-md hover:bg-accent-hover transition-transform transform hover:scale-110 z-50"
-            title={`Remove ${instance.name}`}
+            className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-accent text-white flex items-center justify-center shadow-md hover:bg-accent-hover transition-transform transform hover:scale-110 z-50"
+            title={`Remove ${piece.name}`}
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="w-3 h-3 stroke-[2.5]" />
           </button>
         )}
       </div>
     </div>
   );
 }
-

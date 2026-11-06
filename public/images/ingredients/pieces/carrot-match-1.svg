@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+  <defs>
+    <filter id="carShad1" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="1" dy="2.5" stdDeviation="2" flood-color="#451B06" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <g filter="url(#carShad1)" fill="none" stroke-linecap="round">
+    <path d="M 18 24 L 62 48" stroke="#DE5309" stroke-width="6"/>
+    <path d="M 18 24 L 62 48" stroke="#F87928" stroke-width="3.5"/>
+    <path d="M 24 48 L 58 58" stroke="#F87928" stroke-width="4"/>
+  </g>
+</svg>

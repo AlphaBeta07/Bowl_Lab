@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+  <defs>
+    <filter id="cabShad1" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="1" dy="2.5" stdDeviation="2" flood-color="#2D0B2B" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <g filter="url(#cabShad1)" fill="none" stroke-linecap="round">
+    <path d="M 15 25 Q 40 18 65 35 T 68 58" stroke="#7E2479" stroke-width="7"/>
+    <path d="M 16 25 Q 40 19 63 35 T 66 58" stroke="#C456BE" stroke-width="4"/>
+    <path d="M 18 48 Q 45 42 62 65" stroke="#E274DC" stroke-width="3"/>
+  </g>
+</svg>
