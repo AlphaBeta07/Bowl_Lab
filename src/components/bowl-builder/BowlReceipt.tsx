@@ -30,8 +30,8 @@ export default function BowlReceipt({ onProceedToCart }: BowlReceiptProps) {
   const tax = Math.round(subtotal * 0.05 * 100) / 100;
   const grandTotal = subtotal > 0 ? subtotal + tax + deliveryFee : 0;
 
-  // Group ingredients by ingredientId so multiple servings show as "Fresh Salmon × 2" instead of repeating name
-  const groupedIngredients = React.useMemo(() => {
+  // Group main ingredients (proteins & veggies)
+  const groupedMainIngredients = React.useMemo(() => {
     const groups: {
       ingredientId: string;
       name: string;
@@ -40,18 +40,48 @@ export default function BowlReceipt({ onProceedToCart }: BowlReceiptProps) {
       totalPrice: number;
     }[] = [];
 
-    for (const item of ingredients) {
+    for (const item of ingredients.filter((i) => i.category !== 'toppings')) {
       const existing = groups.find((g) => g.ingredientId === item.ingredientId);
+      const q = item.quantity || 1;
       if (existing) {
-        existing.count += 1;
-        existing.totalPrice += item.price;
+        existing.count += q;
+        existing.totalPrice += item.price * q;
       } else {
         groups.push({
           ingredientId: item.ingredientId,
           name: item.name,
           unitPrice: item.price,
-          count: 1,
-          totalPrice: item.price,
+          count: q,
+          totalPrice: item.price * q,
+        });
+      }
+    }
+    return groups;
+  }, [ingredients]);
+
+  // Group toppings & crunch (Toasted Sesame, Shredded Nori, Crispy Shallots, Peanuts)
+  const groupedToppings = React.useMemo(() => {
+    const groups: {
+      ingredientId: string;
+      name: string;
+      unitPrice: number;
+      count: number;
+      totalPrice: number;
+    }[] = [];
+
+    for (const item of ingredients.filter((i) => i.category === 'toppings')) {
+      const existing = groups.find((g) => g.ingredientId === item.ingredientId);
+      const q = item.quantity || 1;
+      if (existing) {
+        existing.count += q;
+        existing.totalPrice += item.price * q;
+      } else {
+        groups.push({
+          ingredientId: item.ingredientId,
+          name: item.name,
+          unitPrice: item.price,
+          count: q,
+          totalPrice: item.price * q,
         });
       }
     }
@@ -138,7 +168,7 @@ export default function BowlReceipt({ onProceedToCart }: BowlReceiptProps) {
         </div>
 
         {/* Section: Your Bowl Items */}
-        <div className="flex-1 space-y-2 mb-4 max-h-56 overflow-y-auto pr-1 no-scrollbar text-xs">
+        <div className="flex-1 space-y-2 mb-4 max-h-72 sm:max-h-80 overflow-y-auto pr-1 text-xs">
           <div className="font-bold text-[11px] uppercase tracking-wider text-secondary">
             YOUR BOWL
           </div>
@@ -146,13 +176,13 @@ export default function BowlReceipt({ onProceedToCart }: BowlReceiptProps) {
           {/* Base */}
           {base && (
             <div className="flex items-center justify-between py-0.5">
-              <span className="text-foreground">{base.name} base</span>
+              <span className="text-foreground font-medium">{base.name} base</span>
               <span className="font-semibold text-foreground">₹{base.price}</span>
             </div>
           )}
 
-          {/* Grouped Ingredients with Multiple Quantity */}
-          {groupedIngredients.map((item) => (
+          {/* Fresh Ingredients (Proteins & Veggies) */}
+          {groupedMainIngredients.map((item) => (
             <div key={item.ingredientId} className="flex items-center justify-between py-0.5 text-foreground/90">
               <span className="truncate max-w-[190px]">
                 {item.name}
@@ -166,20 +196,49 @@ export default function BowlReceipt({ onProceedToCart }: BowlReceiptProps) {
             </div>
           ))}
 
-          {/* Grouped Sauces */}
-          {groupedSauces.map((sauce) => (
-            <div key={sauce.sauceId} className="flex items-center justify-between py-0.5 text-accent font-medium">
-              <span className="truncate max-w-[190px]">
-                {sauce.name}
-                {sauce.count > 1 && (
-                  <span className="font-bold ml-1.5 font-mono text-[11px]">
-                    × {sauce.count}
+          {/* Toppings & Crunch (Toasted Sesame, Shredded Nori, Crispy Shallots) */}
+          {groupedToppings.length > 0 && (
+            <div className="pt-1.5 border-t border-dashed border-[#E5DECD]/70">
+              <div className="text-[10px] font-bold text-secondary uppercase tracking-wider mb-1">
+                TOPPINGS &amp; CRUNCH
+              </div>
+              {groupedToppings.map((top) => (
+                <div key={top.ingredientId} className="flex items-center justify-between py-0.5 text-foreground/90 font-medium">
+                  <span className="truncate max-w-[190px]">
+                    {top.name}
+                    {top.count > 1 && (
+                      <span className="font-bold text-accent ml-1.5 font-mono text-[11px]">
+                        × {top.count}
+                      </span>
+                    )}
                   </span>
-                )}
-              </span>
-              <span className="font-semibold">₹{sauce.totalPrice}</span>
+                  <span className="font-semibold">₹{top.totalPrice}</span>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
+
+          {/* Grouped Sauces */}
+          {groupedSauces.length > 0 && (
+            <div className="pt-1.5 border-t border-dashed border-[#E5DECD]/70">
+              <div className="text-[10px] font-bold text-secondary uppercase tracking-wider mb-1">
+                SAUCE DRIZZLE
+              </div>
+              {groupedSauces.map((sauce) => (
+                <div key={sauce.sauceId} className="flex items-center justify-between py-0.5 text-accent font-medium">
+                  <span className="truncate max-w-[190px]">
+                    {sauce.name}
+                    {sauce.count > 1 && (
+                      <span className="font-bold ml-1.5 font-mono text-[11px]">
+                        × {sauce.count}
+                      </span>
+                    )}
+                  </span>
+                  <span className="font-semibold">₹{sauce.totalPrice}</span>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Empty Prompt */}
           {!base && ingredients.length === 0 && sauces.length === 0 && (

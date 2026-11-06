@@ -125,6 +125,14 @@ export default function CartDrawer() {
                         </p>
                       )}
 
+                      {/* Toppings Summary */}
+                      {item.summary.toppingNames && item.summary.toppingNames.length > 0 && (
+                        <p className="text-xs text-secondary/90 leading-relaxed font-medium">
+                          <span className="font-semibold text-foreground/80">Toppings:</span>{' '}
+                          {item.summary.toppingNames.join(' · ')}
+                        </p>
+                      )}
+
                       {/* Sauces Summary */}
                       {item.summary.sauceNames.length > 0 && (
                         <p className="text-xs font-semibold text-accent">

@@ -80,7 +80,14 @@ export const store = {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('bowllab_ingredients');
       if (stored) {
-        try { return JSON.parse(stored); } catch {}
+        try {
+          const parsed = JSON.parse(stored) as Ingredient[];
+          // Merge with INITIAL_INGREDIENTS to ensure all 34 ingredients exist even if an older cache exists
+          return INITIAL_INGREDIENTS.map((initial) => {
+            const found = parsed.find((p) => p.id === initial.id);
+            return found ? { ...initial, ...found } : initial;
+          });
+        } catch {}
       }
     }
     return runtimeIngredients;

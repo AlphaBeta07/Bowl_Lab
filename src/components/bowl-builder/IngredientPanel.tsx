@@ -3,6 +3,7 @@
 import React from 'react';
 import { useBowlBuilder } from '@/context/BowlBuilderContext';
 import { INITIAL_INGREDIENTS } from '@/config/catalog';
+import { store } from '@/lib/supabase/store';
 import { Ingredient, IngredientCategory } from '@/types';
 import IngredientCard from './IngredientCard';
 
@@ -10,7 +11,14 @@ interface IngredientPanelProps {
   catalog?: Ingredient[];
 }
 
-export default function IngredientPanel({ catalog = INITIAL_INGREDIENTS }: IngredientPanelProps) {
+export default function IngredientPanel({ catalog: propCatalog }: IngredientPanelProps) {
+  const [catalog, setCatalog] = React.useState<Ingredient[]>(propCatalog || INITIAL_INGREDIENTS);
+
+  React.useEffect(() => {
+    if (!propCatalog) {
+      setCatalog(store.getIngredients());
+    }
+  }, [propCatalog]);
   const {
     isLidOpen,
     isSealed,

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <radialGradient id="wRiceBed" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="65%" stop-color="#FDFBF7"/>
+      <stop offset="90%" stop-color="#F2EDE2"/>
+      <stop offset="100%" stop-color="#E5DDD0"/>
+    </radialGradient>
+    <pattern id="wGrains" width="16" height="16" patternUnits="userSpaceOnUse">
+      <ellipse cx="5" cy="5" rx="4" ry="2" fill="#FFFFFF" transform="rotate(25 5 5)"/>
+      <ellipse cx="5" cy="5" rx="3.5" ry="1.6" fill="#F4EFE6" transform="rotate(25 5 5)"/>
+      <ellipse cx="12" cy="11" rx="4" ry="2" fill="#FFFFFF" transform="rotate(-35 12 11)"/>
+      <ellipse cx="12" cy="11" rx="3.5" ry="1.6" fill="#EBE3D5" transform="rotate(-35 12 11)"/>
+    </pattern>
+  </defs>
+  <circle cx="200" cy="200" r="195" fill="url(#wRiceBed)"/>
+  <circle cx="200" cy="200" r="195" fill="url(#wGrains)" opacity="0.9"/>
+</svg>

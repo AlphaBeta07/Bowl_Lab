@@ -347,7 +347,9 @@ export default function CheckoutPage() {
                         {item.quantity}x {item.bowlName}
                       </p>
                       <p className="text-secondary text-[11px] truncate max-w-[200px]">
-                        {item.summary.baseName} · {item.summary.ingredientNames.slice(0, 3).join(', ')}
+                        {item.summary.baseName}
+                        {item.summary.ingredientNames.length > 0 && ` · ${item.summary.ingredientNames.slice(0, 2).join(', ')}`}
+                        {item.summary.toppingNames && item.summary.toppingNames.length > 0 && ` · ${item.summary.toppingNames.join(', ')}`}
                       </p>
                     </div>
                     <span className="font-mono font-semibold text-foreground">

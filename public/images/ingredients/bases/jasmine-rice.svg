@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <radialGradient id="jRiceBed" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFE"/>
+      <stop offset="70%" stop-color="#FAF7F0"/>
+      <stop offset="100%" stop-color="#E2DBD0"/>
+    </radialGradient>
+    <pattern id="jGrains" width="18" height="18" patternUnits="userSpaceOnUse">
+      <!-- Slender long grains characteristic of Jasmine rice -->
+      <ellipse cx="6" cy="6" rx="5.5" ry="1.8" fill="#FFFFFF" transform="rotate(40 6 6)"/>
+      <ellipse cx="6" cy="6" rx="5" ry="1.4" fill="#F6F2EA" transform="rotate(40 6 6)"/>
+      <ellipse cx="14" cy="13" rx="5.5" ry="1.8" fill="#FFFFFF" transform="rotate(-30 14 13)"/>
+      <ellipse cx="14" cy="13" rx="5" ry="1.4" fill="#ECE5DA" transform="rotate(-30 14 13)"/>
+    </pattern>
+  </defs>
+  <circle cx="200" cy="200" r="195" fill="url(#jRiceBed)"/>
+  <circle cx="200" cy="200" r="195" fill="url(#jGrains)" opacity="0.88"/>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+  <defs>
+    <filter id="lpShad1" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="1" dy="2.5" stdDeviation="2" flood-color="#142B0A" flood-opacity="0.22"/>
+    </filter>
+    <linearGradient id="lpGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#D9F5B5"/>
+      <stop offset="60%" stop-color="#80CE34"/>
+      <stop offset="100%" stop-color="#4EAA15"/>
+    </linearGradient>
+  </defs>
+  <g filter="url(#lpShad1)">
+    <path d="M 40 70 C 26 62, 16 50, 14 36 C 12 22, 24 12, 38 16 C 46 8, 62 10, 68 22 C 76 34, 72 52, 50 68 Z" fill="url(#lpGrad)"/>
+    <path d="M 42 68 Q 40 42 40 22" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.7"/>
+  </g>
+</svg>

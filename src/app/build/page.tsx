@@ -26,6 +26,7 @@ function BuilderContent() {
     decrementSauce,
     activeSqueezingSauce,
     addIngredient,
+    removeIngredientById,
     loadPredefined,
     openLid,
   } = useBowlBuilder();
@@ -115,32 +116,86 @@ function BuilderContent() {
               {/* Topping Ceramic Ramekins beside sauces */}
               <div className="hidden sm:flex items-center gap-3 border-l border-border/80 pl-4">
                 {toppingDishes.map((top) => {
-                  const isPlaced = ingredients.some((i) => i.ingredientId === top.id);
+                  const placedCount = ingredients.filter((i) => i.ingredientId === top.id).length;
+                  const isPlaced = placedCount > 0;
+                  const isDisabled = isSealed || (!isLidOpen && !isSealed);
+
                   return (
-                    <button
+                    <div
                       key={top.id}
-                      onClick={() => addIngredient(top)}
-                      disabled={isSealed}
                       className="group flex flex-col items-center"
-                      title={`Sprinkle ${top.name} (+₹${top.price})`}
                     >
-                      <div className="relative w-11 h-11 transition-transform group-hover:scale-110">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (isPlaced) {
+                            removeIngredientById(top.id);
+                          } else {
+                            addIngredient(top);
+                          }
+                        }}
+                        disabled={isDisabled}
+                        className={`relative w-11 h-11 rounded-full transition-all duration-200 ${
+                          isPlaced
+                            ? 'ring-2 ring-accent scale-105 shadow-sm bg-warm-cream/60'
+                            : 'hover:scale-110 opacity-85 hover:opacity-100'
+                        } ${isDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                        title={isPlaced ? `Remove ${top.name}` : `Sprinkle ${top.name} (+₹${top.price})`}
+                      >
                         <Image
                           src={top.imageUrl}
                           alt={top.name}
                           fill
-                          className="object-contain"
+                          className="object-contain p-0.5"
                         />
                         {isPlaced && (
-                          <span className="absolute -top-1 -right-1 bg-accent text-white w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center">
-                            ✓
+                          <span className="absolute -top-1 -right-1 bg-accent text-white min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center shadow-sm">
+                            {placedCount > 1 ? `×${placedCount}` : '✓'}
                           </span>
                         )}
-                      </div>
+                      </button>
+
                       <span className="text-[10px] font-bold text-foreground mt-1">
                         {top.name.split(' ')[0]}
                       </span>
-                    </button>
+
+                      {/* Stepper when placed, or unit price when not */}
+                      {isPlaced ? (
+                        <div className="flex items-center gap-1 mt-0.5 bg-surface border border-border/90 rounded-full px-1.5 py-0.5 shadow-sm">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeIngredientById(top.id);
+                            }}
+                            disabled={isDisabled}
+                            className="w-4 h-4 rounded-full bg-[#EAE4D7] hover:bg-accent hover:text-white flex items-center justify-center text-[10px] font-bold text-foreground transition-colors cursor-pointer disabled:opacity-40"
+                            title={`Remove ${top.name}`}
+                          >
+                            −
+                          </button>
+                          <span className="text-[10px] font-bold font-mono px-0.5 min-w-[12px] text-center text-foreground select-none">
+                            {placedCount}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              addIngredient(top);
+                            }}
+                            disabled={isDisabled}
+                            className="w-4 h-4 rounded-full bg-[#EAE4D7] hover:bg-accent hover:text-white flex items-center justify-center text-[10px] font-bold text-foreground transition-colors cursor-pointer disabled:opacity-40"
+                            title={`Add another serving of ${top.name} (+₹${top.price})`}
+                          >
+                            +
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="text-[9px] font-mono text-secondary font-semibold mt-0.5">
+                          +₹{top.price}
+                        </span>
+                      )}
+                    </div>
                   );
                 })}
               </div>

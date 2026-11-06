@@ -114,6 +114,11 @@ export default function AdminOrdersPage() {
                           + {item.summary.ingredientNames.join(', ')}
                         </p>
                       )}
+                      {item.summary.toppingNames && item.summary.toppingNames.length > 0 && (
+                        <p className="text-secondary text-[11px] font-medium">
+                          + Toppings: {item.summary.toppingNames.join(', ')}
+                        </p>
+                      )}
                       {item.summary.sauceNames.length > 0 && (
                         <p className="text-accent text-[11px] font-semibold">
                           Drizzle: {item.summary.sauceNames.join(' & ')}

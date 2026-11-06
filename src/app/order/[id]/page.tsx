@@ -175,6 +175,13 @@ export default function OrderConfirmationPage() {
                     </p>
                   )}
 
+                  {item.summary.toppingNames && item.summary.toppingNames.length > 0 && (
+                    <p className="text-xs text-secondary leading-relaxed font-medium">
+                      <span className="font-semibold text-foreground/80">Toppings:</span>{' '}
+                      {item.summary.toppingNames.join(' · ')}
+                    </p>
+                  )}
+
                   {item.summary.sauceNames.length > 0 && (
                     <p className="text-xs font-semibold text-accent">
                       Sauces: {item.summary.sauceNames.join(' & ')}

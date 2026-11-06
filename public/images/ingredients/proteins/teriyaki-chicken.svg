@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
+  <defs>
+    <filter id="tcDrop" x="-20%" y="-20%" width="150%" height="150%">
+      <feDropShadow dx="2" dy="5" stdDeviation="3.5" flood-color="#261005" flood-opacity="0.3"/>
+    </filter>
+    <linearGradient id="teriGlaze" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7A3912"/>
+      <stop offset="60%" stop-color="#4F1D03"/>
+      <stop offset="100%" stop-color="#2D0F00"/>
+    </linearGradient>
+  </defs>
+  <g filter="url(#tcDrop)">
+    <!-- Strip 1 -->
+    <path d="M 25 50 C 35 35, 75 32, 90 45 C 100 55, 95 75, 80 80 C 65 85, 30 80, 20 65 Z" fill="url(#teriGlaze)"/>
+    <!-- Strip 1 Char marks & glaze highlights -->
+    <path d="M 38 43 Q 48 55 58 45" stroke="#1F0700" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M 60 48 Q 70 60 80 50" stroke="#1F0700" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M 32 46 Q 55 40 82 48" stroke="#D18341" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.85"/>
+    <ellipse cx="55" cy="46" rx="10" ry="3" fill="#FFF2DE" opacity="0.35" transform="rotate(-10 55 46)"/>
+    <!-- Sesame sprinkles on chicken -->
+    <ellipse cx="45" cy="52" rx="2.5" ry="1.2" fill="#FFFFFF" transform="rotate(25 45 52)"/>
+    <ellipse cx="65" cy="58" rx="2.5" ry="1.2" fill="#FFFFFF" transform="rotate(-35 65 58)"/>
+    <ellipse cx="78" cy="62" rx="2.2" ry="1" fill="#FFFFFF" transform="rotate(10 78 62)"/>
+
+    <!-- Strip 2 -->
+    <path d="M 60 90 C 70 75, 115 72, 135 85 C 145 98, 138 120, 120 125 C 95 132, 65 125, 55 110 Z" fill="url(#teriGlaze)"/>
+    <path d="M 75 85 Q 85 98 98 88" stroke="#1F0700" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M 102 92 Q 115 105 125 96" stroke="#1F0700" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M 70 88 Q 98 82 126 92" stroke="#D18341" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.85"/>
+    <ellipse cx="98" cy="88" rx="11" ry="3.5" fill="#FFF2DE" opacity="0.35" transform="rotate(-8 98 88)"/>
+    <ellipse cx="85" cy="98" rx="2.5" ry="1.2" fill="#FFFFFF" transform="rotate(40 85 98)"/>
+    <ellipse cx="112" cy="104" rx="2.5" ry="1.2" fill="#FFFFFF" transform="rotate(-20 112 104)"/>
+
+    <!-- Strip 3 mini chunk -->
+    <path d="M 30 95 C 40 85, 65 90, 68 105 C 70 118, 55 130, 42 128 C 30 125, 22 110, 30 95 Z" fill="url(#teriGlaze)"/>
+    <ellipse cx="48" cy="106" rx="2.5" ry="1.2" fill="#FFFFFF" transform="rotate(15 48 106)"/>
+  </g>
+</svg>

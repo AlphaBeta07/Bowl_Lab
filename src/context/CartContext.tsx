@@ -67,15 +67,31 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const addCustomBowlToCart = useCallback((customBowl: CustomBowl, quantity: number = 1) => {
     const baseName = customBowl.base?.name || 'Sushi Rice';
 
-    // Group multiple quantities of the same ingredient instead of repeating names
+    // Separate fresh ingredients (proteins, veggies) and crunch toppings
+    const mainIngredients = customBowl.ingredients.filter((i) => i.category !== 'toppings');
+    const toppingIngredients = customBowl.ingredients.filter((i) => i.category === 'toppings');
+
+    // Group multiple quantities of fresh ingredients
     const ingredientCounts: Record<string, { name: string; count: number }> = {};
-    for (const ing of customBowl.ingredients) {
+    for (const ing of mainIngredients) {
       if (!ingredientCounts[ing.ingredientId]) {
         ingredientCounts[ing.ingredientId] = { name: ing.name, count: 0 };
       }
-      ingredientCounts[ing.ingredientId].count += 1;
+      ingredientCounts[ing.ingredientId].count += ing.quantity || 1;
     }
     const ingredientNames = Object.values(ingredientCounts).map((item) =>
+      item.count > 1 ? `${item.name} × ${item.count}` : item.name
+    );
+
+    // Group multiple quantities of crunch toppings
+    const toppingCounts: Record<string, { name: string; count: number }> = {};
+    for (const top of toppingIngredients) {
+      if (!toppingCounts[top.ingredientId]) {
+        toppingCounts[top.ingredientId] = { name: top.name, count: 0 };
+      }
+      toppingCounts[top.ingredientId].count += top.quantity || 1;
+    }
+    const toppingNames = Object.values(toppingCounts).map((item) =>
       item.count > 1 ? `${item.name} × ${item.count}` : item.name
     );
 
@@ -100,6 +116,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       summary: {
         baseName,
         ingredientNames,
+        toppingNames,
         sauceNames,
       },
       customBowlData: customBowl,

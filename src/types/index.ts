@@ -93,6 +93,7 @@ export interface CartItem {
   summary: {
     baseName: string;
     ingredientNames: string[];
+    toppingNames?: string[];
     sauceNames: string[];
   };
   customBowlData?: CustomBowl;

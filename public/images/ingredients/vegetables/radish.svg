@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
+  <defs>
+    <filter id="radDrop" x="-20%" y="-20%" width="150%" height="150%">
+      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="#3D0A24" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <g filter="url(#radDrop)">
+    <!-- Slice 1 -->
+    <g transform="translate(25, 30)">
+      <!-- Outer pink skin ring -->
+      <circle cx="45" cy="45" r="38" fill="#E61E68"/>
+      <!-- Inner crisp white flesh -->
+      <circle cx="45" cy="45" r="32" fill="#FFFFFF"/>
+      <circle cx="45" cy="45" r="31" fill="#FFF5F8"/>
+      <!-- Fine radial lines -->
+      <circle cx="45" cy="45" r="12" fill="#FCE6EE" opacity="0.6"/>
+      <circle cx="45" cy="45" r="4" fill="#E61E68" opacity="0.4"/>
+    </g>
+    <!-- Slice 2 overlapping -->
+    <g transform="translate(65, 55)">
+      <circle cx="35" cy="35" r="30" fill="#E61E68"/>
+      <circle cx="35" cy="35" r="25" fill="#FFFFFF"/>
+      <circle cx="35" cy="35" r="24" fill="#FFF5F8"/>
+      <circle cx="35" cy="35" r="9" fill="#FCE6EE" opacity="0.6"/>
+    </g>
+  </g>
+</svg>

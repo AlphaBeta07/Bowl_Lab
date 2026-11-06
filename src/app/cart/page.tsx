@@ -109,7 +109,15 @@ export default function CartPage() {
 
                     {item.summary.ingredientNames.length > 0 && (
                       <p className="text-xs text-secondary leading-relaxed">
-                        Toppings: {item.summary.ingredientNames.join(' · ')}
+                        <span className="font-medium text-foreground/80">Ingredients:</span>{' '}
+                        {item.summary.ingredientNames.join(' · ')}
+                      </p>
+                    )}
+
+                    {item.summary.toppingNames && item.summary.toppingNames.length > 0 && (
+                      <p className="text-xs text-secondary leading-relaxed font-medium">
+                        <span className="font-semibold text-foreground/80">Toppings:</span>{' '}
+                        {item.summary.toppingNames.join(' · ')}
                       </p>
                     )}
 

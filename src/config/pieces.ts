@@ -6,7 +6,7 @@ export interface PieceConfig {
 }
 
 export const INGREDIENT_PIECES_MAP: Record<string, PieceConfig> = {
-  // PROTEINS
+  // 1. PROTEINS (10 Total)
   'salmon': {
     variants: [
       '/images/ingredients/pieces/salmon-cube-1.svg',
@@ -27,15 +27,6 @@ export const INGREDIENT_PIECES_MAP: Record<string, PieceConfig> = {
     baseScale: 1.0,
     minDist: 0.08,
   },
-  'crispy-tofu': {
-    variants: [
-      '/images/ingredients/pieces/tofu-cube-1.svg',
-      '/images/ingredients/pieces/tofu-cube-2.svg',
-    ],
-    count: 5,
-    baseScale: 0.95,
-    minDist: 0.08,
-  },
   'grilled-chicken': {
     variants: [
       '/images/ingredients/pieces/chicken-chunk-1.svg',
@@ -44,6 +35,15 @@ export const INGREDIENT_PIECES_MAP: Record<string, PieceConfig> = {
     count: 4,
     baseScale: 1.05,
     minDist: 0.09,
+  },
+  'crispy-tofu': {
+    variants: [
+      '/images/ingredients/pieces/tofu-cube-1.svg',
+      '/images/ingredients/pieces/tofu-cube-2.svg',
+    ],
+    count: 5,
+    baseScale: 0.95,
+    minDist: 0.08,
   },
   'paneer': {
     variants: [
@@ -61,17 +61,40 @@ export const INGREDIENT_PIECES_MAP: Record<string, PieceConfig> = {
     baseScale: 1.0,
     minDist: 0.1,
   },
-
-  // VEGETABLES
-  'avocado': {
+  'teriyaki-chicken': {
     variants: [
-      '/images/ingredients/pieces/avocado-slice-1.svg',
-      '/images/ingredients/pieces/avocado-slice-2.svg',
+      '/images/ingredients/pieces/teriyaki-chicken-1.svg',
+    ],
+    count: 5,
+    baseScale: 1.05,
+    minDist: 0.08,
+  },
+  'spicy-shrimp': {
+    variants: [
+      '/images/ingredients/pieces/spicy-shrimp-1.svg',
+    ],
+    count: 5,
+    baseScale: 1.0,
+    minDist: 0.08,
+  },
+  'boiled-egg': {
+    variants: [
+      '/images/ingredients/pieces/boiled-egg-1.svg',
     ],
     count: 4,
     baseScale: 1.05,
     minDist: 0.09,
   },
+  'chickpeas': {
+    variants: [
+      '/images/ingredients/pieces/chickpea-1.svg',
+    ],
+    count: 7,
+    baseScale: 0.85,
+    minDist: 0.06,
+  },
+
+  // 2. VEGETABLES (14 Total)
   'cucumber': {
     variants: [
       '/images/ingredients/pieces/cucumber-slice-1.svg',
@@ -81,21 +104,21 @@ export const INGREDIENT_PIECES_MAP: Record<string, PieceConfig> = {
     baseScale: 0.9,
     minDist: 0.07,
   },
-  'edamame': {
+  'avocado': {
     variants: [
-      '/images/ingredients/pieces/edamame-bean-1.svg',
-      '/images/ingredients/pieces/edamame-bean-2.svg',
+      '/images/ingredients/pieces/avocado-slice-1.svg',
+      '/images/ingredients/pieces/avocado-slice-2.svg',
     ],
-    count: 7,
-    baseScale: 0.85,
-    minDist: 0.06,
+    count: 4,
+    baseScale: 1.05,
+    minDist: 0.09,
   },
-  'mango': {
+  'carrots': {
     variants: [
-      '/images/ingredients/pieces/mango-cube-1.svg',
+      '/images/ingredients/pieces/carrot-match-1.svg',
     ],
     count: 5,
-    baseScale: 0.9,
+    baseScale: 0.95,
     minDist: 0.08,
   },
   'red-cabbage': {
@@ -106,7 +129,16 @@ export const INGREDIENT_PIECES_MAP: Record<string, PieceConfig> = {
     baseScale: 1.0,
     minDist: 0.08,
   },
-  'corn': {
+  'edamame': {
+    variants: [
+      '/images/ingredients/pieces/edamame-bean-1.svg',
+      '/images/ingredients/pieces/edamame-bean-2.svg',
+    ],
+    count: 7,
+    baseScale: 0.85,
+    minDist: 0.06,
+  },
+  'sweet-corn': {
     variants: [
       '/images/ingredients/pieces/corn-kernel-1.svg',
     ],
@@ -114,13 +146,13 @@ export const INGREDIENT_PIECES_MAP: Record<string, PieceConfig> = {
     baseScale: 0.85,
     minDist: 0.06,
   },
-  'carrots': {
+  'corn': {
     variants: [
-      '/images/ingredients/pieces/carrot-match-1.svg',
+      '/images/ingredients/pieces/corn-kernel-1.svg',
     ],
-    count: 5,
-    baseScale: 0.95,
-    minDist: 0.08,
+    count: 6,
+    baseScale: 0.85,
+    minDist: 0.06,
   },
   'cherry-tomatoes': {
     variants: [
@@ -130,8 +162,64 @@ export const INGREDIENT_PIECES_MAP: Record<string, PieceConfig> = {
     baseScale: 0.95,
     minDist: 0.09,
   },
+  'bell-peppers': {
+    variants: [
+      '/images/ingredients/pieces/bell-pepper-strip-1.svg',
+    ],
+    count: 5,
+    baseScale: 1.0,
+    minDist: 0.08,
+  },
+  'spring-onions': {
+    variants: [
+      '/images/ingredients/pieces/spring-onion-ring.svg',
+    ],
+    count: 6,
+    baseScale: 0.85,
+    minDist: 0.06,
+  },
+  'broccoli': {
+    variants: [
+      '/images/ingredients/pieces/broccoli-floret-1.svg',
+    ],
+    count: 4,
+    baseScale: 1.0,
+    minDist: 0.09,
+  },
+  'radish': {
+    variants: [
+      '/images/ingredients/pieces/radish-slice-1.svg',
+    ],
+    count: 5,
+    baseScale: 0.9,
+    minDist: 0.08,
+  },
+  'pickled-onions': {
+    variants: [
+      '/images/ingredients/pieces/pickled-onion-ring-1.svg',
+    ],
+    count: 5,
+    baseScale: 0.95,
+    minDist: 0.08,
+  },
+  'lettuce': {
+    variants: [
+      '/images/ingredients/pieces/lettuce-leaf-1.svg',
+    ],
+    count: 5,
+    baseScale: 1.0,
+    minDist: 0.08,
+  },
+  'jalapenos': {
+    variants: [
+      '/images/ingredients/pieces/jalapeno-round-1.svg',
+    ],
+    count: 5,
+    baseScale: 0.9,
+    minDist: 0.08,
+  },
 
-  // TOPPINGS
+  // 3. TOPPINGS
   'sesame-seeds': {
     variants: [
       '/images/ingredients/pieces/sesame-cluster.svg',
@@ -164,13 +252,4 @@ export const INGREDIENT_PIECES_MAP: Record<string, PieceConfig> = {
     baseScale: 0.85,
     minDist: 0.07,
   },
-  'spring-onions': {
-    variants: [
-      '/images/ingredients/pieces/spring-onion-ring.svg',
-    ],
-    count: 5,
-    baseScale: 0.85,
-    minDist: 0.07,
-  },
 };
-

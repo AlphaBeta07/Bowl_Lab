@@ -6,42 +6,93 @@ import AdminNav from '@/components/admin/AdminNav';
 import { store } from '@/lib/supabase/store';
 import { Ingredient, IngredientCategory } from '@/types';
 import { formatINR } from '@/lib/pricing/calculator';
-import { Plus, Edit2, Check, X, Carrot } from 'lucide-react';
+import { Plus, Edit2, Check, X, Sparkles, RefreshCw } from 'lucide-react';
 
 export default function AdminIngredientsPage() {
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [selectedCat, setSelectedCat] = useState<string>('all');
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editPrice, setEditPrice] = useState<number>(0);
+  const [editingItem, setEditingItem] = useState<Ingredient | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [statusNote, setStatusNote] = useState<string | null>(null);
 
-  const load = () => {
-    setIngredients(store.getIngredients());
+  const load = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/ingredients');
+      if (res.ok) {
+        const json = await res.json();
+        if (json.ingredients && json.ingredients.length > 0) {
+          setIngredients(json.ingredients);
+          store.setIngredients(json.ingredients);
+          setIsLoading(false);
+          return;
+        }
+      }
+    } catch {
+      // Fallback
+    }
+    const local = store.getIngredients();
+    setIngredients(local);
+    setIsLoading(false);
   };
 
   useEffect(() => {
     load();
   }, []);
 
-  const handleToggleAvailable = (id: string) => {
-    const updated = ingredients.map((item) =>
-      item.id === id ? { ...item, isAvailable: !item.isAvailable } : item
+  const handleToggleAvailable = async (item: Ingredient) => {
+    const newStatus = !item.isAvailable;
+    const updated = ingredients.map((i) =>
+      i.id === item.id ? { ...i, isAvailable: newStatus } : i
     );
-    store.setIngredients(updated);
     setIngredients(updated);
+    store.setIngredients(updated);
+
+    try {
+      await fetch('/api/ingredients', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: item.id, isAvailable: newStatus }),
+      });
+      setStatusNote(`Updated ${item.name} availability.`);
+      setTimeout(() => setStatusNote(null), 3000);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const handleSavePrice = (id: string) => {
-    const updated = ingredients.map((item) =>
-      item.id === id ? { ...item, price: Number(editPrice) } : item
+  const handleSaveModal = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingItem) return;
+
+    const updated = ingredients.map((i) =>
+      i.id === editingItem.id ? editingItem : i
     );
-    store.setIngredients(updated);
     setIngredients(updated);
-    setEditingId(null);
+    store.setIngredients(updated);
+
+    try {
+      await fetch('/api/ingredients', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editingItem),
+      });
+      setStatusNote(`Saved changes for ${editingItem.name}.`);
+      setTimeout(() => setStatusNote(null), 3000);
+    } catch (err) {
+      console.error(err);
+    }
+
+    setEditingItem(null);
   };
 
   const filtered = ingredients.filter((i) =>
     selectedCat === 'all' ? true : i.category === selectedCat
   );
+
+  const proteinCount = ingredients.filter((i) => i.category === 'proteins').length;
+  const veggieCount = ingredients.filter((i) => i.category === 'vegetables').length;
+  const baseCount = ingredients.filter((i) => i.category === 'bases').length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -49,45 +100,68 @@ export default function AdminIngredientsPage() {
 
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-6">
         
+        {/* Header with Catalog Summary */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-border gap-4">
           <div>
-            <h1 className="font-display text-3xl font-black text-foreground">
-              Ingredient Catalog Manager
-            </h1>
-            <p className="text-secondary text-xs font-mono mt-0.5">
-              Control live pricing, stock availability, and allergen tags for builder components.
+            <div className="flex items-center gap-2">
+              <h1 className="font-display text-3xl font-black text-foreground">
+                Ingredient Catalog Manager
+              </h1>
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold font-mono bg-accent/10 text-accent border border-accent/20">
+                34 Builder Items
+              </span>
+            </div>
+            <p className="text-secondary text-xs font-mono mt-1">
+              Active Catalog: <strong className="text-foreground">{proteinCount} Proteins</strong> · <strong className="text-foreground">{veggieCount} Veggies</strong> · <strong className="text-foreground">{baseCount} Bases</strong>. Fully synced to Supabase database.
             </p>
           </div>
 
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-            {['all', 'bases', 'proteins', 'vegetables', 'toppings', 'sauces'].map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCat(cat)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all capitalize whitespace-nowrap ${
-                  selectedCat === cat
-                    ? 'bg-foreground text-background'
-                    : 'bg-surface border border-border text-secondary hover:text-foreground'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={load}
+              className="p-2 rounded-xl border border-border bg-surface text-secondary hover:text-foreground transition-colors"
+              title="Refresh from database"
+            >
+              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            </button>
+
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+              {['all', 'bases', 'proteins', 'vegetables', 'toppings', 'sauces'].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCat(cat)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all capitalize whitespace-nowrap ${
+                    selectedCat === cat
+                      ? 'bg-foreground text-background'
+                      : 'bg-surface border border-border text-secondary hover:text-foreground'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Table / Card Grid */}
+        {statusNote && (
+          <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 animate-in fade-in">
+            <Check className="w-4 h-4 text-emerald-600" />
+            {statusNote}
+          </div>
+        )}
+
+        {/* Card Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.map((item) => (
             <div
               key={item.id}
-              className={`bg-surface border rounded-3xl p-5 shadow-subtle flex flex-col justify-between transition-all ${
-                item.isAvailable ? 'border-border' : 'border-red-200 bg-red-50/20 opacity-70'
+              className={`bg-surface border rounded-3xl p-5 shadow-subtle flex flex-col justify-between transition-all group ${
+                item.isAvailable ? 'border-border' : 'border-red-200 bg-red-50/20 opacity-75'
               }`}
             >
               <div>
                 <div className="flex items-start justify-between mb-3">
-                  <div className="relative w-14 h-14 bg-cream-50 rounded-2xl flex items-center justify-center p-2">
+                  <div className="relative w-14 h-14 bg-cream-50 rounded-2xl flex items-center justify-center p-2 border border-border/50">
                     <Image
                       src={item.imageUrl}
                       alt={item.name}
@@ -96,9 +170,18 @@ export default function AdminIngredientsPage() {
                     />
                   </div>
 
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-cream-100 text-secondary">
-                    {item.category}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-cream-100 text-secondary">
+                      {item.category}
+                    </span>
+                    <button
+                      onClick={() => setEditingItem({ ...item })}
+                      className="p-1.5 text-secondary hover:text-accent rounded-lg hover:bg-cream-100 transition-colors"
+                      title="Edit ingredient details"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
 
                 <h3 className="font-bold text-base text-foreground">{item.name}</h3>
@@ -129,43 +212,14 @@ export default function AdminIngredientsPage() {
               {/* Price & Stock Availability Actions */}
               <div className="mt-5 pt-3 border-t border-border flex items-center justify-between">
                 <div>
-                  {editingId === item.id ? (
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-mono">₹</span>
-                      <input
-                        type="number"
-                        value={editPrice}
-                        onChange={(e) => setEditPrice(Number(e.target.value))}
-                        className="w-16 px-1.5 py-1 text-xs border border-accent rounded font-mono"
-                      />
-                      <button
-                        onClick={() => handleSavePrice(item.id)}
-                        className="p-1 bg-accent text-white rounded"
-                      >
-                        <Check className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-display font-black text-lg text-foreground">
-                        {formatINR(item.price)}
-                      </span>
-                      <button
-                        onClick={() => {
-                          setEditingId(item.id);
-                          setEditPrice(item.price);
-                        }}
-                        className="text-secondary hover:text-accent p-1"
-                        title="Edit price"
-                      >
-                        <Edit2 className="w-3 h-3" />
-                      </button>
-                    </div>
-                  )}
+                  <span className="font-display font-black text-lg text-foreground">
+                    {formatINR(item.price)}
+                  </span>
+                  <span className="text-[10px] text-secondary font-mono block">per serving</span>
                 </div>
 
                 <button
-                  onClick={() => handleToggleAvailable(item.id)}
+                  onClick={() => handleToggleAvailable(item)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${
                     item.isAvailable
                       ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100'
@@ -180,7 +234,114 @@ export default function AdminIngredientsPage() {
         </div>
 
       </div>
+
+      {/* Edit Ingredient Modal */}
+      {editingItem && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-surface border border-border rounded-3xl p-6 max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between pb-3 border-b border-border">
+              <h2 className="font-bold text-lg text-foreground">Edit Ingredient</h2>
+              <button
+                onClick={() => setEditingItem(null)}
+                className="p-1 rounded-full text-secondary hover:text-foreground"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveModal} className="space-y-4 mt-4">
+              <div>
+                <label className="block text-xs font-bold text-foreground mb-1">
+                  Ingredient Name
+                </label>
+                <input
+                  type="text"
+                  value={editingItem.name}
+                  onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-border rounded-xl text-sm font-semibold focus:outline-none focus:border-accent"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-foreground mb-1">
+                  Price (INR ₹)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={editingItem.price}
+                  onChange={(e) =>
+                    setEditingItem({ ...editingItem, price: Number(e.target.value) })
+                  }
+                  className="w-full px-3 py-2 border border-border rounded-xl text-sm font-mono font-bold focus:outline-none focus:border-accent"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-foreground mb-1">
+                  Description
+                </label>
+                <textarea
+                  value={editingItem.description}
+                  onChange={(e) =>
+                    setEditingItem({ ...editingItem, description: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-border rounded-xl text-xs leading-relaxed focus:outline-none focus:border-accent"
+                  rows={2}
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-foreground mb-1">
+                  Illustration URL / Asset Path
+                </label>
+                <input
+                  type="text"
+                  value={editingItem.imageUrl}
+                  onChange={(e) =>
+                    setEditingItem({ ...editingItem, imageUrl: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-border rounded-xl text-xs font-mono focus:outline-none focus:border-accent"
+                  required
+                />
+              </div>
+
+              <div className="flex items-center justify-between pt-2">
+                <label className="text-xs font-bold text-foreground flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editingItem.isAvailable}
+                    onChange={(e) =>
+                      setEditingItem({ ...editingItem, isAvailable: e.target.checked })
+                    }
+                    className="accent-accent w-4 h-4 rounded"
+                  />
+                  <span>Available in Bowl Builder</span>
+                </label>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-border">
+                <button
+                  type="button"
+                  onClick={() => setEditingItem(null)}
+                  className="px-4 py-2 rounded-xl text-xs font-bold border border-border text-secondary hover:text-foreground"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl text-xs font-bold bg-accent text-white hover:bg-accent-hover shadow-md transition-colors"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
