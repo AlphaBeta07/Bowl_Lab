@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useBowlBuilder } from '@/context/BowlBuilderContext';
 import { useCart } from '@/context/CartContext';
 import { formatINR } from '@/lib/pricing/calculator';
-import { ArrowRight, ShoppingBag, Sparkles, Check } from 'lucide-react';
+import { ArrowRight, ShoppingBag, Sparkles } from 'lucide-react';
 
 interface BowlReceiptProps {
   onProceedToCart?: () => void;
@@ -21,7 +21,6 @@ export default function BowlReceipt({ onProceedToCart }: BowlReceiptProps) {
     sauces,
     subtotal,
     sealBowl,
-    reopenBowl,
     getCustomBowlData,
   } = useBowlBuilder();
 
@@ -31,9 +30,62 @@ export default function BowlReceipt({ onProceedToCart }: BowlReceiptProps) {
   const tax = Math.round(subtotal * 0.05 * 100) / 100;
   const grandTotal = subtotal > 0 ? subtotal + tax + deliveryFee : 0;
 
+  // Group ingredients by ingredientId so multiple servings show as "Fresh Salmon × 2" instead of repeating name
+  const groupedIngredients = React.useMemo(() => {
+    const groups: {
+      ingredientId: string;
+      name: string;
+      unitPrice: number;
+      count: number;
+      totalPrice: number;
+    }[] = [];
+
+    for (const item of ingredients) {
+      const existing = groups.find((g) => g.ingredientId === item.ingredientId);
+      if (existing) {
+        existing.count += 1;
+        existing.totalPrice += item.price;
+      } else {
+        groups.push({
+          ingredientId: item.ingredientId,
+          name: item.name,
+          unitPrice: item.price,
+          count: 1,
+          totalPrice: item.price,
+        });
+      }
+    }
+    return groups;
+  }, [ingredients]);
+
+  // Group sauces in case of multiple drizzles
+  const groupedSauces = React.useMemo(() => {
+    const groups: {
+      sauceId: string;
+      name: string;
+      count: number;
+      totalPrice: number;
+    }[] = [];
+
+    for (const s of sauces) {
+      const existing = groups.find((g) => g.sauceId === s.sauceId);
+      if (existing) {
+        existing.count += 1;
+        existing.totalPrice += s.price;
+      } else {
+        groups.push({
+          sauceId: s.sauceId,
+          name: s.name,
+          count: 1,
+          totalPrice: s.price,
+        });
+      }
+    }
+    return groups;
+  }, [sauces]);
+
   const handleSealOrAddToCart = () => {
     if (!isLidOpen && !isSealed) {
-      // If closed, open lid
       return;
     }
 
@@ -98,19 +150,33 @@ export default function BowlReceipt({ onProceedToCart }: BowlReceiptProps) {
             </div>
           )}
 
-          {/* Ingredients */}
-          {ingredients.map((item) => (
-            <div key={item.instanceId} className="flex items-center justify-between py-0.5 text-foreground/90">
-              <span className="truncate max-w-[190px]">{item.name}</span>
-              <span className="font-semibold">₹{item.price}</span>
+          {/* Grouped Ingredients with Multiple Quantity */}
+          {groupedIngredients.map((item) => (
+            <div key={item.ingredientId} className="flex items-center justify-between py-0.5 text-foreground/90">
+              <span className="truncate max-w-[190px]">
+                {item.name}
+                {item.count > 1 && (
+                  <span className="font-bold text-accent ml-1.5 font-mono text-[11px]">
+                    × {item.count}
+                  </span>
+                )}
+              </span>
+              <span className="font-semibold">₹{item.totalPrice}</span>
             </div>
           ))}
 
-          {/* Sauces */}
-          {sauces.map((sauce) => (
-            <div key={sauce.id} className="flex items-center justify-between py-0.5 text-accent font-medium">
-              <span className="truncate max-w-[190px]">{sauce.name}</span>
-              <span className="font-semibold">₹{sauce.price}</span>
+          {/* Grouped Sauces */}
+          {groupedSauces.map((sauce) => (
+            <div key={sauce.sauceId} className="flex items-center justify-between py-0.5 text-accent font-medium">
+              <span className="truncate max-w-[190px]">
+                {sauce.name}
+                {sauce.count > 1 && (
+                  <span className="font-bold ml-1.5 font-mono text-[11px]">
+                    × {sauce.count}
+                  </span>
+                )}
+              </span>
+              <span className="font-semibold">₹{sauce.totalPrice}</span>
             </div>
           ))}
 
@@ -214,4 +280,3 @@ export default function BowlReceipt({ onProceedToCart }: BowlReceiptProps) {
     </div>
   );
 }
-

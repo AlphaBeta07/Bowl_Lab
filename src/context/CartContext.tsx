@@ -66,8 +66,29 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addCustomBowlToCart = useCallback((customBowl: CustomBowl, quantity: number = 1) => {
     const baseName = customBowl.base?.name || 'Sushi Rice';
-    const ingredientNames = customBowl.ingredients.map((i) => i.name);
-    const sauceNames = customBowl.sauces.map((s) => s.name);
+
+    // Group multiple quantities of the same ingredient instead of repeating names
+    const ingredientCounts: Record<string, { name: string; count: number }> = {};
+    for (const ing of customBowl.ingredients) {
+      if (!ingredientCounts[ing.ingredientId]) {
+        ingredientCounts[ing.ingredientId] = { name: ing.name, count: 0 };
+      }
+      ingredientCounts[ing.ingredientId].count += 1;
+    }
+    const ingredientNames = Object.values(ingredientCounts).map((item) =>
+      item.count > 1 ? `${item.name} × ${item.count}` : item.name
+    );
+
+    const sauceCounts: Record<string, { name: string; count: number }> = {};
+    for (const sauce of customBowl.sauces) {
+      if (!sauceCounts[sauce.sauceId]) {
+        sauceCounts[sauce.sauceId] = { name: sauce.name, count: 0 };
+      }
+      sauceCounts[sauce.sauceId].count += 1;
+    }
+    const sauceNames = Object.values(sauceCounts).map((item) =>
+      item.count > 1 ? `${item.name} × ${item.count}` : item.name
+    );
 
     const newItem: CartItem = {
       id: `cart-custom-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
