@@ -23,6 +23,8 @@ function BuilderContent() {
     sauces,
     ingredients,
     squeezeSauce,
+    decrementSauce,
+    activeSqueezingSauce,
     addIngredient,
     loadPredefined,
     openLid,
@@ -91,17 +93,23 @@ function BuilderContent() {
             <div className="w-full flex flex-wrap items-center justify-center gap-4 sm:gap-6 pb-4 mb-2 border-b border-border/60">
               
               {/* Squeeze bottles */}
-              <div className="flex items-center gap-3 sm:gap-4">
-                {sauceList.slice(0, 3).map((sauce) => (
-                  <SauceBottle
-                    key={sauce.id}
-                    ingredient={sauce}
-                    isSqueezing={false}
-                    isApplied={sauces.some((s) => s.sauceId === sauce.id)}
-                    onSelect={squeezeSauce}
-                    disabled={isSealed || (!isLidOpen && !isSealed)}
-                  />
-                ))}
+              <div className="flex items-center gap-2.5 sm:gap-4 overflow-x-auto max-w-full pb-1 no-scrollbar">
+                {sauceList.map((sauce) => {
+                  const appliedSauce = sauces.find((s) => s.sauceId === sauce.id);
+                  return (
+                    <SauceBottle
+                      key={sauce.id}
+                      ingredient={sauce}
+                      isSqueezing={activeSqueezingSauce?.id === sauce.id}
+                      isApplied={!!appliedSauce}
+                      quantity={appliedSauce?.quantity || 0}
+                      onSelect={squeezeSauce}
+                      onIncrement={() => squeezeSauce(sauce)}
+                      onDecrement={() => decrementSauce(sauce.id)}
+                      disabled={isSealed || (!isLidOpen && !isSealed)}
+                    />
+                  );
+                })}
               </div>
 
               {/* Topping Ceramic Ramekins beside sauces */}

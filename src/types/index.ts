@@ -53,6 +53,7 @@ export interface SauceDrizzle {
   bottleUrl: string;
   price: number;
   color: string;
+  quantity?: number;
 }
 
 export interface CustomBowl {

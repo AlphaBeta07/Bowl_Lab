@@ -35,7 +35,7 @@ export function calculateCustomBowlSubtotal(
   for (const sauce of bowl.sauces) {
     const matched = catalog.find((i) => i.id === sauce.sauceId);
     const unitPrice = matched ? matched.price : sauce.price;
-    sum += unitPrice;
+    sum += unitPrice * (sauce.quantity || 1);
   }
 
   return Math.round(sum * 100) / 100;

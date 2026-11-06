@@ -69,15 +69,16 @@ export default function BowlReceipt({ onProceedToCart }: BowlReceiptProps) {
 
     for (const s of sauces) {
       const existing = groups.find((g) => g.sauceId === s.sauceId);
+      const q = s.quantity || 1;
       if (existing) {
-        existing.count += 1;
-        existing.totalPrice += s.price;
+        existing.count += q;
+        existing.totalPrice += s.price * q;
       } else {
         groups.push({
           sauceId: s.sauceId,
           name: s.name,
-          count: 1,
-          totalPrice: s.price,
+          count: q,
+          totalPrice: s.price * q,
         });
       }
     }

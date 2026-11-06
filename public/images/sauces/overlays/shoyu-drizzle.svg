@@ -1,14 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
   <defs>
-    <filter id="sauceShadow" x="-10%" y="-10%" width="130%" height="130%">
-      <feDropShadow dx="2" dy="5" stdDeviation="4" flood-color="#1C0804" flood-opacity="0.35"/>
+    <filter id="shoyuShadow1" x="-15%" y="-15%" width="135%" height="135%">
+      <feDropShadow dx="1.5" dy="4" stdDeviation="3.5" flood-color="#1A0803" flood-opacity="0.45"/>
     </filter>
   </defs>
-  <!-- Beautiful organic drizzled loops -->
-  <g filter="url(#sauceShadow)">
-    <path d="M 60 120 C 120 70, 160 180, 210 110 C 260 50, 290 160, 240 220 C 190 280, 110 200, 80 260 C 60 290, 150 320, 220 290" 
-          stroke="#45180D" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <path d="M 60 120 C 120 70, 160 180, 210 110 C 260 50, 290 160, 240 220 C 190 280, 110 200, 80 260 C 60 290, 150 320, 220 290" 
-          stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.45"/>
+  <g filter="url(#shoyuShadow1)">
+    <!-- Elegant organic spiral circling the center -->
+    <path d="M 200 110 
+             C 270 110, 310 160, 305 220 
+             C 300 280, 245 315, 185 305 
+             C 130 295, 105 240, 120 180 
+             C 135 130, 205 145, 235 175 
+             C 265 205, 250 255, 215 255 
+             C 180 255, 170 220, 195 205"
+          stroke="#3D1409" stroke-width="10.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9"/>
+    <!-- Translucent soy gloss line -->
+    <path d="M 200 110 
+             C 270 110, 310 160, 305 220 
+             C 300 280, 245 315, 185 305 
+             C 130 295, 105 240, 120 180 
+             C 135 130, 205 145, 235 175"
+          stroke="#7A3521" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.65"/>
+    <!-- Fine droplets -->
+    <circle cx="215" cy="115" r="3.5" fill="#3D1409"/>
+    <circle cx="295" cy="265" r="3" fill="#3D1409"/>
+    <circle cx="130" cy="270" r="3.5" fill="#3D1409"/>
   </g>
 </svg>

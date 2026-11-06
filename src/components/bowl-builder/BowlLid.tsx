@@ -30,7 +30,7 @@ export default function BowlLid({ lidRef, onClick, isOpen, isAnimating, isSealed
           alt="Bowl Lid"
           fill
           priority
-          className="object-contain drop-shadow-2xl transition-transform duration-300 group-hover:scale-[1.02]"
+          className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
         />
 
         {/* Hover Cue when lid is closed */}

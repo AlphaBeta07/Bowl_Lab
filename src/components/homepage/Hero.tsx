@@ -136,7 +136,7 @@ export default function Hero() {
                   alt="Craft Signature Salmon Bowl"
                   fill
                   priority
-                  className="object-contain drop-shadow-2xl transition-transform duration-500 group-hover:scale-105"
+                  className="object-contain transition-transform duration-500 group-hover:scale-105"
                 />
 
                 {/* Floating Lid Hint */}

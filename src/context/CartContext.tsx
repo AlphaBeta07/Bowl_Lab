@@ -84,7 +84,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (!sauceCounts[sauce.sauceId]) {
         sauceCounts[sauce.sauceId] = { name: sauce.name, count: 0 };
       }
-      sauceCounts[sauce.sauceId].count += 1;
+      sauceCounts[sauce.sauceId].count += sauce.quantity || 1;
     }
     const sauceNames = Object.values(sauceCounts).map((item) =>
       item.count > 1 ? `${item.name} × ${item.count}` : item.name

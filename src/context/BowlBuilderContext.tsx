@@ -40,6 +40,7 @@ interface BowlBuilderContextType {
   removeIngredientById: (ingredientId: string) => void;
   repositionPiece: (pieceId: string, x: number, y: number) => void;
   squeezeSauce: (sauceIngredient: Ingredient) => void;
+  decrementSauce: (sauceId: string) => void;
   removeSauce: (sauceId: string) => void;
   undo: () => void;
   resetBowl: () => void;
@@ -261,7 +262,7 @@ export function BowlBuilderProvider({ children }: { children: React.ReactNode })
     );
   }, []);
 
-  // 8. Sauce Squeeze Animation Trigger
+  // 8. Sauce Squeeze Animation Trigger & Quantity Controls
   const squeezeSauce = useCallback(
     (sauceIngredient: Ingredient) => {
       if (!isLidOpen || isLidAnimating || isSealed) return;
@@ -275,6 +276,8 @@ export function BowlBuilderProvider({ children }: { children: React.ReactNode })
         'shoyu': '/images/sauces/overlays/shoyu-drizzle.svg',
         'sesame-ginger': '/images/sauces/overlays/sesame-ginger-drizzle.svg',
         'sriracha': '/images/sauces/overlays/sriracha-drizzle.svg',
+        'peanut-sauce': '/images/sauces/overlays/peanut-sauce-drizzle.svg',
+        'lemon-herb': '/images/sauces/overlays/lemon-herb-drizzle.svg',
       };
 
       const drizzleOverlay =
@@ -282,9 +285,19 @@ export function BowlBuilderProvider({ children }: { children: React.ReactNode })
 
       setTimeout(() => {
         setSauces((prev) => {
-          if (prev.some((s) => s.sauceId === sauceIngredient.id)) {
-            return prev;
+          const existingIndex = prev.findIndex((s) => s.sauceId === sauceIngredient.id);
+          if (existingIndex >= 0) {
+            const updated = [...prev];
+            const cur = updated[existingIndex];
+            const newQty = (cur.quantity || 1) + 1;
+            updated[existingIndex] = {
+              ...cur,
+              quantity: newQty,
+            };
+            setStatusMessage(`Added extra ${sauceIngredient.name} (×${newQty}).`);
+            return updated;
           }
+          setStatusMessage(`${sauceIngredient.name} drizzled.`);
           return [
             ...prev,
             {
@@ -295,12 +308,38 @@ export function BowlBuilderProvider({ children }: { children: React.ReactNode })
               bottleUrl: sauceIngredient.imageUrl,
               price: sauceIngredient.price,
               color: '#F15A35',
+              quantity: 1,
             },
           ];
         });
         setActiveSqueezingSauce(null);
-        setStatusMessage(`${sauceIngredient.name} drizzled.`);
       }, 1200);
+    },
+    [isLidOpen, isLidAnimating, isSealed, saveHistory]
+  );
+
+  const decrementSauce = useCallback(
+    (sauceId: string) => {
+      if (!isLidOpen || isLidAnimating || isSealed) return;
+      saveHistory();
+      setSauces((prev) => {
+        const existingIndex = prev.findIndex((s) => s.sauceId === sauceId);
+        if (existingIndex < 0) return prev;
+        const cur = prev[existingIndex];
+        const curQty = cur.quantity || 1;
+        if (curQty > 1) {
+          const updated = [...prev];
+          updated[existingIndex] = {
+            ...cur,
+            quantity: curQty - 1,
+          };
+          setStatusMessage(`Reduced ${cur.name} (×${curQty - 1}).`);
+          return updated;
+        } else {
+          setStatusMessage(`${cur.name} removed.`);
+          return prev.filter((s) => s.sauceId !== sauceId);
+        }
+      });
     },
     [isLidOpen, isLidAnimating, isSealed, saveHistory]
   );
@@ -380,6 +419,14 @@ export function BowlBuilderProvider({ children }: { children: React.ReactNode })
       setIngredients(loadedIngredients);
 
       const loadedSauces: SauceDrizzle[] = [];
+      const overlayMap: Record<string, string> = {
+        'spicy-mayo': '/images/sauces/overlays/spicy-mayo-drizzle.svg',
+        'shoyu': '/images/sauces/overlays/shoyu-drizzle.svg',
+        'sesame-ginger': '/images/sauces/overlays/sesame-ginger-drizzle.svg',
+        'sriracha': '/images/sauces/overlays/sriracha-drizzle.svg',
+        'peanut-sauce': '/images/sauces/overlays/peanut-sauce-drizzle.svg',
+        'lemon-herb': '/images/sauces/overlays/lemon-herb-drizzle.svg',
+      };
       sauceIds.forEach((id) => {
         const sauce = INITIAL_INGREDIENTS.find((i) => i.id === id);
         if (sauce) {
@@ -387,13 +434,11 @@ export function BowlBuilderProvider({ children }: { children: React.ReactNode })
             id: `sauce-${id}`,
             sauceId: sauce.id,
             name: sauce.name,
-            overlayUrl:
-              id === 'shoyu'
-                ? '/images/sauces/overlays/shoyu-drizzle.svg'
-                : '/images/sauces/overlays/spicy-mayo-drizzle.svg',
+            overlayUrl: overlayMap[id] || '/images/sauces/overlays/spicy-mayo-drizzle.svg',
             bottleUrl: sauce.imageUrl,
             price: sauce.price,
             color: '#F15A35',
+            quantity: 1,
           });
         }
       });
@@ -455,6 +500,7 @@ export function BowlBuilderProvider({ children }: { children: React.ReactNode })
         removeIngredientById,
         repositionPiece,
         squeezeSauce,
+        decrementSauce,
         removeSauce,
         undo,
         resetBowl,

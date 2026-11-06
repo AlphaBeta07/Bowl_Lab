@@ -214,20 +214,39 @@ export default function BowlCanvas() {
               />
             ))}
 
-            {/* 2c. Sauce Overlays (Drizzled on top of ingredients) */}
-            {sauces.map((sauce) => (
-              <div
-                key={sauce.id}
-                className="absolute inset-0 pointer-events-none z-30 animate-in fade-in zoom-in-95 duration-500"
-              >
-                <Image
-                  src={sauce.overlayUrl}
-                  alt={sauce.name}
-                  fill
-                  className="object-contain"
-                />
-              </div>
-            ))}
+            {/* 2c. Sauce Overlays (Drizzled on top of ingredients with multi-pass support) */}
+            {sauces.map((sauce) => {
+              const qty = sauce.quantity || 1;
+              const layers = Array.from({ length: Math.min(qty, 4) }, (_, i) => i);
+              return (
+                <React.Fragment key={sauce.id}>
+                  {layers.map((layerIdx) => {
+                    const rotation =
+                      layerIdx === 0 ? 0 : layerIdx === 1 ? 55 : layerIdx === 2 ? 115 : 170;
+                    const scale =
+                      layerIdx === 0 ? 1 : layerIdx === 1 ? 0.96 : layerIdx === 2 ? 1.02 : 0.98;
+                    const opacity = layerIdx === 0 ? 1 : 0.88;
+                    return (
+                      <div
+                        key={`${sauce.id}-layer-${layerIdx}`}
+                        className="absolute inset-0 pointer-events-none z-30 animate-in fade-in zoom-in-95 duration-500"
+                        style={{
+                          transform: `rotate(${rotation}deg) scale(${scale})`,
+                          opacity,
+                        }}
+                      >
+                        <Image
+                          src={sauce.overlayUrl}
+                          alt={`${sauce.name} drizzle layer ${layerIdx + 1}`}
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
+                    );
+                  })}
+                </React.Fragment>
+              );
+            })}
           </div>
 
           {/* 3. Sauce Stream Drizzle Animation */}

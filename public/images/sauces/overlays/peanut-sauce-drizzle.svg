@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <filter id="peaShadow1" x="-15%" y="-15%" width="135%" height="135%">
+      <feDropShadow dx="2" dy="4.5" stdDeviation="4" flood-color="#3A2209" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <g filter="url(#peaShadow1)">
+    <path d="M 90 160 C 150 130, 180 200, 240 150 C 290 110, 330 170, 320 230 C 270 270, 210 210, 150 260 C 110 290, 170 330, 240 310"
+          stroke="#A86C32" stroke-width="12.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M 90 160 C 150 130, 180 200, 240 150 C 290 110, 330 170, 320 230 C 270 270, 210 210, 150 260 C 110 290, 170 330, 240 310"
+          stroke="#E8C5A0" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.5"/>
+  </g>
+</svg>

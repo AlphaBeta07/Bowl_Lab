@@ -1,14 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
   <defs>
-    <filter id="sauceShadow" x="-10%" y="-10%" width="130%" height="130%">
-      <feDropShadow dx="2" dy="5" stdDeviation="4" flood-color="#452C04" flood-opacity="0.35"/>
+    <filter id="sesameShadow1" x="-15%" y="-15%" width="135%" height="135%">
+      <feDropShadow dx="2" dy="4.5" stdDeviation="4" flood-color="#422B03" flood-opacity="0.35"/>
     </filter>
   </defs>
-  <!-- Beautiful organic drizzled loops -->
-  <g filter="url(#sauceShadow)">
-    <path d="M 60 120 C 120 70, 160 180, 210 110 C 260 50, 290 160, 240 220 C 190 280, 110 200, 80 260 C 60 290, 150 320, 220 290" 
-          stroke="#D49619" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <path d="M 60 120 C 120 70, 160 180, 210 110 C 260 50, 290 160, 240 220 C 190 280, 110 200, 80 260 C 60 290, 150 320, 220 290" 
-          stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.45"/>
+  <g filter="url(#sesameShadow1)">
+    <!-- Sweeping S-waves across opposing diagonal -->
+    <path d="M 110 290 
+             C 140 230, 190 290, 230 240 
+             C 270 190, 220 140, 275 105 
+             M 135 320 
+             C 195 280, 160 200, 225 170 
+             C 285 140, 310 180, 335 130"
+          stroke="#D99B16" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M 110 290 
+             C 140 230, 190 290, 230 240 
+             C 270 190, 220 140, 275 105 
+             M 135 320 
+             C 195 280, 160 200, 225 170 
+             C 285 140, 310 180, 335 130"
+          stroke="#FFF7D6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6"/>
+    <!-- Sesame speckles -->
+    <circle cx="170" cy="260" r="4" fill="#D99B16"/>
+    <circle cx="260" cy="180" r="4.5" fill="#D99B16"/>
+    <circle cx="210" cy="140" r="3.5" fill="#D99B16"/>
   </g>
 </svg>
